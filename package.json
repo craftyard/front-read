@@ -24,7 +24,7 @@
     "@nestjs/core": "^10.0.0",
     "@nestjs/platform-express": "^10.0.0",
     "reflect-metadata": "^0.1.13",
-    "rilata2": "git@github.com:NurGeo/rilata2",
+    "rilata2": "git@github.com:soul-workshop/rilata2.git",
     "rxjs": "^7.8.1",
     "workshop-domain": "github:soul-workshop/domain"
   },
