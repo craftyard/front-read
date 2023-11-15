@@ -10,7 +10,6 @@ pnpm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
-bun.lockb
 
 # OS
 .DS_Store
@@ -34,3 +33,7 @@ bun.lockb
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+
+# locks
+bun.lockb
+pnpm-lock.yaml
