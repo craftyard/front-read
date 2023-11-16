@@ -6,5 +6,6 @@ module.exports = {
     'import/no-unresolved': 'off',
     'import/prefer-default-export': 'off',
     'class-methods-use-this': 'off',
+    'import/extensions': 'off',
   },
 };
