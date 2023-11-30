@@ -1,5 +1,5 @@
 import {
-  verify, sign, Algorithm, JwtPayload,
+  verify, sign,
 } from 'jsonwebtoken';
 import { failure } from 'rilata2/src/common/result/failure';
 import { success } from 'rilata2/src/common/result/success';
@@ -10,12 +10,17 @@ import {
 } from 'rilata2/src/app/jwt/errors';
 import { dodUtility } from 'rilata2/src/common/utils/domain-object/dod-utility';
 import { JWTDecodeLibJWTManager } from 'rilata2/src/infra/jwt/jwt-decode-lib.jwt-manager';
-import { BackendJWTManager } from 'subject/backend-jwt-manager.interface';
+import { BackendJWTManager } from 'subject/app/jwt/backend-jwt-manager.interface';
 import { JWTPayload, JwtTokens } from 'workshop-domain/src/subject/domain-data/user/user-authentification.a-params';
-import { PlainJWTPayload, TokenType } from './types';
+import { JWTConfig } from 'subject/config/jwt/types';
+import { PlainJWTPayload, TokenType } from '../../app/jwt/types';
 
 export class SubjectAuthJWTManager
-  extends JWTDecodeLibJWTManager<JwtPayload> implements BackendJWTManager<JwtPayload> {
+  extends JWTDecodeLibJWTManager<JWTPayload> implements BackendJWTManager<JWTPayload> {
+  constructor(private jwtConfig: JWTConfig) {
+    super();
+  }
+
   /**
    * Проверить и получить полезные данные jwt
    * @param rawToken токен для проверки
@@ -31,14 +36,14 @@ export class SubjectAuthJWTManager
    *     - - JsonWebTokenError - базовая ошибка библиотеки jsonwebtoken
    */
   verifyToken(rawToken: string, tokenType: TokenType):
-    Result<VerifyTokenError, JwtPayload> {
-    let verifyRes: PlainJWTPayload<JwtPayload>;
+    Result<VerifyTokenError, JWTPayload> {
+    let verifyRes: PlainJWTPayload<JWTPayload>;
     try {
       verifyRes = verify(
         rawToken,
-        this.getPublicKey(),
-        { algorithms: [this.getAlgorithm()], ignoreExpiration: false },
-      ) as PlainJWTPayload<JwtPayload>;
+        this.jwtConfig.publicKey,
+        { algorithms: [this.jwtConfig.algorithm], ignoreExpiration: false },
+      ) as PlainJWTPayload<JWTPayload>;
     } catch (err) {
       switch ((<Error>err).constructor.name) {
         case 'TokenExpiredError':
@@ -82,7 +87,7 @@ export class SubjectAuthJWTManager
   }
 
   /** Проверить простые полезные данные jwt. */
-  public verifyPayload<PP extends PlainJWTPayload<JwtPayload>>(
+  public verifyPayload<PP extends PlainJWTPayload<JWTPayload>>(
     payload: PP,
   ): Result<undefined, PP> {
     if (typeof payload !== 'object') return failure(undefined);
@@ -97,72 +102,38 @@ export class SubjectAuthJWTManager
   createToken(payload: JWTPayload): JwtTokens {
     const accessToken = sign(
       this.getPlainPayload(payload, 'access'),
-      this.getPrivateKey(),
+      this.jwtConfig.privateKey,
       {
-        algorithm: this.getAlgorithm(),
-        expiresIn: this.getAccessExpiresIn(),
+        algorithm: this.jwtConfig.algorithm,
+        expiresIn: this.jwtConfig.accessTokenExpiresIn,
       },
     );
 
     const refreshToken = sign(
       this.getPlainPayload(payload, 'refresh'),
-      this.getPrivateKey(),
+      this.jwtConfig.privateKey,
       {
-        algorithm: this.getAlgorithm(),
-        expiresIn: this.getRefreshExpiresIn(),
+        algorithm: this.jwtConfig.algorithm,
+        expiresIn: this.jwtConfig.refreshTokenExpiresIn,
       },
     );
     return { accessToken, refreshToken };
   }
 
-  /** Получить открытый ключ подписи токена. */
-  protected getPublicKey(): string {
-    return process.env.JWT_PUBLIC_KEY as string;
-  }
-
-  /** Получить алгоритм подписи токена. */
-  protected getAlgorithm(): Algorithm {
-    return 'RS512';
-  }
-
   /** Проверить внутреннюю структуру конкретной полезной нагрузки */
   protected checkPayloadInnerStructure(
-    payload: JwtPayload,
-  ): Result<undefined, JwtPayload> {
-    if (typeof payload.userID !== 'string') return failure(undefined);
-    if (typeof payload.govPersonID !== 'string') return failure(undefined);
+    payload: JWTPayload,
+  ): Result<undefined, JWTPayload> {
+    if (typeof payload.userId !== 'string') return failure(undefined);
+    if (typeof payload.telegramId !== 'number') return failure(undefined);
+    if (payload.employeeId && typeof payload.employeeId !== 'string') return failure(undefined);
     return success(payload);
   }
 
-  /** Получить закрытый ключ подписи токена. */
-  protected getPrivateKey(): string {
-    return process.env.JWT_PRIVATE_KEY as string;
-  }
-
-  /** Получить значение через сколько истекает время токена доступа.
-   * Возможные значения:
-   * года - '1y',
-   * дни - '2d',
-   * часы - '10h',
-   * минуты - '1m',
-   * секунды - '5s',
-   * миллисекунды - '100ms'.
-  */
-  protected getAccessExpiresIn(): string {
-    return '10h';
-  }
-
-  /** Получить значение через сколько истекает время токена обновления.
-   * Возможные значения такие же, как и для метода getAccessExpiresIn.
-  */
-  protected getRefreshExpiresIn(): string {
-    return '3d';
-  }
-
   protected getPlainPayload(
-    payload: JwtPayload,
+    payload: JWTPayload,
     tokenType: TokenType,
-  ): PlainJWTPayload<JwtPayload> {
+  ): PlainJWTPayload<JWTPayload> {
     return {
       tokenType,
       payload,
