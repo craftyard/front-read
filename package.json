@@ -23,7 +23,7 @@
     "jsonwebtoken": "^9.0.2",
     "reflect-metadata": "^0.1.13",
     "rilata2": "soul-workshop/rilata2",
-    "workshop-domain": "soul-workshop/domain#feature/token-creator-interface"
+    "workshop-domain": "soul-workshop/domain"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",
