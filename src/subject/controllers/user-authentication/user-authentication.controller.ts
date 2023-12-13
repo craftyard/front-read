@@ -10,6 +10,8 @@ import { Response } from 'express';
 import { failure } from 'rilata2/src/common/result/failure';
 import { success } from 'rilata2/src/common/result/success';
 import { TelegramAuthDTO } from 'workshop-domain/src/subject/domain-data/user/user-authentification.a-params';
+import { AuthenticationUserUC } from 'subject/use-cases/user-authentication/use-case';
+import { AuthenticationUserInputOptions } from 'subject/use-cases/user-authentication/use-case-params';
 import { controllerUtility } from '../controller.utility';
 
 export const WORKSHOP_BACKEND_URL_PREFIX = 'api/';
@@ -22,18 +24,21 @@ export class UserAuthenticationController {
   @Post()
   async authentication(
     // Извлечение запроса аутентификации пользователя из тела запроса
-    @Body() userAuthenticationQuery: TelegramAuthDTO,
+    @Body() telegramAuthDTO: TelegramAuthDTO,
     // Объект ответа Express для управления HTTP-ответом
     @Res({ passthrough: true }) response: Response,
     // Объект запроса Express для доступа к деталям входящего HTTP-запроса
     @Req() req: Request,
   ): Promise<void> {
-    // Создание экземпляра использования UserAuthenticationUC
-    const useCase = UserAuthenticationUC.instance(this.resolver);
+    // Создание экземпляра использования AuthenticationUserUC
+    const useCase = new AuthenticationUserUC();
 
     // Конфигурация параметров использования
-    const ucOptions: UserAuthenticationUCOptions = {
-      input: userAuthenticationQuery,
+    const ucOptions: AuthenticationUserInputOptions = {
+      query: {
+        attrs: telegramAuthDTO,
+        name: 'AuthenticationUserUCQuery',
+      },
       caller: req.user,
     };
 
