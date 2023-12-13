@@ -9,31 +9,26 @@ import {
 import { Response } from 'express';
 import { failure } from 'rilata2/src/common/result/failure';
 import { success } from 'rilata2/src/common/result/success';
-import { TelegramAuthDTO } from 'workshop-domain/src/subject/domain-data/user/user-authentification.a-params';
 import { AuthenticationUserUC } from 'subject/use-cases/user-authentication/use-case';
-import { AuthenticationUserInputOptions } from 'subject/use-cases/user-authentication/use-case-params';
-import { controllerUtility } from '../controller.utility';
+import { AuthenticationUserErrors, AuthenticationUserInputOptions, AuthenticationUserSuccessOut } from 'subject/use-cases/user-authentication/use-case-params';
+import { RequestCY } from 'craft-yard-backend/src/app/jwt/types';
+import { TelegramAuthDTO } from 'workshop-domain/src/subject/domain-data/user/user-authentification/a-params';
+import { UseCaseOut, controllerUtility } from '../controller.utility';
 
 export const WORKSHOP_BACKEND_URL_PREFIX = 'api/';
 export const USER_AUTHENTICATION_RENEWAL_ENDPOINT = `${WORKSHOP_BACKEND_URL_PREFIX}auth/refresh-token`;
+export const refreshTokenCookieName = 'refreshToken';
 
-// Класс контроллера для обработки аутентификации пользователя
 @Controller(USER_AUTHENTICATION_RENEWAL_ENDPOINT)
 export class UserAuthenticationController {
-  // Обработка POST-запросов для аутентификации пользователя
   @Post()
   async authentication(
-    // Извлечение запроса аутентификации пользователя из тела запроса
     @Body() telegramAuthDTO: TelegramAuthDTO,
-    // Объект ответа Express для управления HTTP-ответом
     @Res({ passthrough: true }) response: Response,
-    // Объект запроса Express для доступа к деталям входящего HTTP-запроса
-    @Req() req: Request,
+    @Req() req: RequestCY,
   ): Promise<void> {
-    // Создание экземпляра использования AuthenticationUserUC
     const useCase = new AuthenticationUserUC();
 
-    // Конфигурация параметров использования
     const ucOptions: AuthenticationUserInputOptions = {
       query: {
         attrs: telegramAuthDTO,
@@ -42,31 +37,20 @@ export class UserAuthenticationController {
       caller: req.user,
     };
 
-    // Выполнение использования для аутентификации пользователя
     const useCaseResult = await useCase.execute(ucOptions);
 
-    // Обработка успешного сценария
-    if (useCaseResult.isSuccess()) {
-      // Установка refresh-токена как куки в ответе
-      response.cookie(
-        'refreshToken',
-        `${useCaseResult.value.attrs.refresh}`,
-        { sameSite: 'lax', httpOnly: true, secure: false },
-      );
-    }
+    const backendResult: UseCaseOut<
+    AuthenticationUserErrors,
+    AuthenticationUserSuccessOut
+    > = useCaseResult.isFailure()
+      ? failure(useCaseResult.value) : success(useCaseResult.value);
 
-    // Подготовка результата для бэкенда на основе результата использования
-    const backendResult: UserAuthenticationUCOut = useCaseResult.isFailure()
-      ? failure(useCaseResult.value) : success(useCaseResult.value.attrs.access);
-
-    // Установка HTTP-статуса ответа на основе результата бэкенда
     if (backendResult.isSuccess()) {
       response.status(HttpStatus.CREATED);
     } else {
       response.status(controllerUtility.defineUseCaseFailureResultHTTPStatus(backendResult));
     }
 
-    // Отправка преобразованного результата как HTTP-ответ
     response.send(controllerUtility.convertToResultDTO(backendResult));
   }
 }

@@ -1,5 +1,14 @@
 import { Failure } from 'rilata2/src/common/result/failure';
-import { InferFailure } from 'rilata2/src/common/result/types';
+import { InferFailure, InferSuccess, Result } from 'rilata2/src/common/result/types';
+
+export type UseCaseOut<
+  F extends GeneralDomainErrorDOD | GeneralAppErrorDOD,
+  S,
+> = Result<F | CommonUseCaseOutFailures, S>;
+export type GeneralUseCaseOut = UseCaseOut<GeneralDomainErrorDOD | GeneralAppErrorDOD, unknown>;
+export const validationErrorName = 'ValidationError';
+export const callerPermissionErrorName = 'CallerPermissionError';
+export const internalErrorName = 'InternalError';
 
 class ControllerUtility {
   defineUseCaseFailureResultHTTPStatus(
