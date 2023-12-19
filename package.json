@@ -20,10 +20,10 @@
     "@nestjs/common": "^10.0.0",
     "@nestjs/core": "^10.0.0",
     "@nestjs/platform-express": "^10.0.0",
-    "craft-yard-backend": "soul-workshop/craft-yard-backend",
+    "craft-yard-backend": "git+https://github.com/soul-workshop/craft-yard-backend",
     "reflect-metadata": "^0.1.13",
-    "rilata2": "soul-workshop/rilata2",
-    "workshop-domain": "soul-workshop/domain"
+    "rilata2": "git+https://github.com/soul-workshop/rilata2",
+    "workshop-domain": "git+https://github.com/soul-workshop/domain"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",
