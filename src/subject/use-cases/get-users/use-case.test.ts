@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable max-classes-per-file */
 import {
   describe, test, expect, spyOn,
 } from 'bun:test';
