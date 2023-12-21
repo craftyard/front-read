@@ -1,5 +1,5 @@
 import { QueryUseCase } from 'rilata2/src/app/use-case/query-use-case';
-import { GetUcResult } from 'rilata2/src/app/use-case/types';
+import { UcResult } from 'rilata2/src/app/use-case/types';
 import { TokenCreator } from 'rilata2/src/app/jwt/token-creator.interface';
 import { UserAuthentificationInputOptions, UserAuthentificationUCParams } from 'workshop-domain/src/subject/domain-data/user/user-authentification/uc-params';
 import { userAuthentificationValidator } from 'workshop-domain/src/subject/domain-data/user/user-authentification/v-map';
@@ -18,7 +18,7 @@ export class UserAuthentificationUC extends QueryUseCase<UserAuthentificationUCP
 
   protected async runDomain(
     options: UserAuthentificationInputOptions,
-  ): Promise<GetUcResult<UserAuthentificationUCParams>> {
+  ): Promise<UcResult<UserAuthentificationUCParams>> {
     const userRepo = UserRepository.instance(this.moduleResolver);
     const telegramId = options.actionDod.body.id;
     const userAttrs = await userRepo.findByTelegramId(telegramId);

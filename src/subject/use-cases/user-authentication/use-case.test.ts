@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import {
-  describe, test, expect, spyOn, mock, beforeAll, afterAll,
+  describe, test, expect, spyOn, beforeAll, afterAll,
 } from 'bun:test';
 import { JWTTokens } from 'rilata2/src/app/jwt/types';
 import { TokenCreator } from 'rilata2/src/app/jwt/token-creator.interface';
@@ -27,7 +27,6 @@ describe('user authentification use case tests', () => {
   const resolver = new SubjectUseCaseFixtures.ResolverMock();
   const tokenCreatorMock = {
     createToken(): JWTTokens {
-      console.log('create!!!');
       return {
         accessToken: 'some access token',
         refreshToken: 'some refresh token',
@@ -59,7 +58,10 @@ describe('user authentification use case tests', () => {
   };
 
   test('успех, возвращен сгенерированный токен', async () => {
-    const findTelegramIdMock = spyOn(resolver.getRepository(UserRepository), 'findByTelegramId').mockImplementation(
+    const findTelegramIdMock = spyOn(
+      resolver.getRepository(UserRepository),
+      'findByTelegramId',
+    ).mockImplementation(
       async (telegramId: TelegramId) => {
         const users: UserAttrs[] = [{
           type: 'client',
@@ -120,35 +122,27 @@ describe('user authentification use case tests', () => {
     });
   });
 
-  test('провал, запрос досупен только для авторизованных пользователей', async () => {
+  test('провал, запрос досупен только для неавторизованных пользователей', async () => {
     const notValid: UserAuthentificationInputOptions = {
       ...inputOptions,
-      actionDod: {
-        actionName: 'userAuthentification',
-        body: {
-          id: -694528239,
-          auth_date: new Date('2021-01-01').getTime() - 1000,
-          hash: 'f48f14a7c9ceff0b320a7233a6395299e67418cce6b0c04246eb1eecac35f7b6',
-        },
+      caller: {
+        type: 'DomainUser',
+        userId: 'any user id',
+        requestID: '',
       },
     };
     const result = await sut.execute(notValid);
     expect(result.isFailure()).toBe(true);
     expect(result.value).toEqual({
-      name: 'Validation Error',
-      domainType: 'error',
-      errorType: 'app-error',
-      errors: {
-        userAuthentification: {
-          id: [
-            {
-              text: 'Число должно быть положительным',
-              hint: {},
-              name: 'PositiveNumberValidationRule',
-            },
-          ],
+      name: 'Permission denied',
+      locale: {
+        text: 'Действие не доступно',
+        hint: {
+          allowedOnlyFor: ['AnonymousUser'],
         },
       },
+      errorType: 'domain-error',
+      domainType: 'error',
     });
   });
 });
