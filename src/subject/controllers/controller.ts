@@ -1,5 +1,5 @@
 import {
-  Body, Controller, Inject, Post, Req, Res,
+  Body, Controller, Post, Req, Res,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { RequestCY } from 'craft-yard-backend/src/app/jwt/types';
@@ -16,7 +16,7 @@ export class SubjectController extends ParentController {
     @Body() body: ActionDod,
     @Res({ passthrough: true }) response: Response,
     @Req() req: RequestCY,
-    @Inject() module: SubjectModule,
+      module: SubjectModule,
   ): Promise<void> {
     return this.executeUseCase(body, req.user, module, response);
   }

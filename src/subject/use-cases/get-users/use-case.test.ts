@@ -83,7 +83,7 @@ describe('тесты для use-case getUsers', () => {
     const getUsersMock = spyOn(
       resolver.getRepository('repoKey'),
       'getUsers',
-    ).mockReturnValueOnce(Promise.resolve([...users]));
+    ).mockResolvedValueOnce([...users]);
 
     const result = await sut.execute(validInputOptions);
     expect(result.isSuccess()).toBe(true);
