@@ -9,5 +9,6 @@ module.exports = {
     'import/no-extraneous-dependencies': 'off',
     'import/extensions': 'off',
     'max-classes-per-file': 'off',
+    '@typescript-eslint/no-namespace': 'off',
   },
 };
