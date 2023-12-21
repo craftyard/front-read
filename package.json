@@ -21,6 +21,7 @@
     "@nestjs/core": "^10.0.0",
     "@nestjs/platform-express": "^10.0.0",
     "craft-yard-backend": "git+https://github.com/soul-workshop/craft-yard-backend",
+    "express": "^4.18.2",
     "reflect-metadata": "^0.1.13",
     "rilata2": "git+https://github.com/soul-workshop/rilata2",
     "workshop-domain": "git+https://github.com/soul-workshop/domain"
