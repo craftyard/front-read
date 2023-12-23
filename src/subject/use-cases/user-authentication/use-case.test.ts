@@ -55,15 +55,15 @@ describe('user authentification use case tests', () => {
 
   sut.init(resolver);
 
-  const oneUserFindedauthQuery: TelegramAuthDTO = {
+  const oneUserFindedAuthQuery: TelegramAuthDTO = {
     id: 3290593910,
     auth_date: new Date('2021-01-01').getTime() - 1000,
     hash: '69d4ebba0b28a1b88634ef973918deffcf75d08d87f683677efb18baebc73c4d',
   };
-  const oneUserFindedinputOptions: UserAuthentificationInputOptions = {
+  const oneUserFindedInputOptions: UserAuthentificationInputOptions = {
     actionDod: {
       actionName: 'userAuthentification',
-      body: oneUserFindedauthQuery,
+      body: oneUserFindedAuthQuery,
     },
     caller: {
       type: 'AnonymousUser',
@@ -78,7 +78,7 @@ describe('user authentification use case tests', () => {
   };
 
   const manyUserFindedInputOptions = {
-    ...oneUserFindedinputOptions,
+    ...oneUserFindedInputOptions,
     actionDod: {
       actionName: 'userAuthentification' as const,
       body: manyUserFindedAuthQuery,
@@ -89,7 +89,7 @@ describe('user authentification use case tests', () => {
     resolveRealisationMock.mockClear();
     findByTelegramIdMock.mockClear();
 
-    const result = await sut.execute(oneUserFindedinputOptions);
+    const result = await sut.execute(oneUserFindedInputOptions);
     expect(result.isSuccess()).toBe(true);
     expect(result.value).toEqual({
       accessToken: 'some access token',
@@ -198,7 +198,7 @@ describe('user authentification use case tests', () => {
 
   test('провал, не прошла валидация', async () => {
     const notValid: UserAuthentificationInputOptions = {
-      ...oneUserFindedinputOptions,
+      ...oneUserFindedInputOptions,
       actionDod: {
         actionName: 'userAuthentification',
         body: {
@@ -230,7 +230,7 @@ describe('user authentification use case tests', () => {
 
   test('провал, запрос досупен только для неавторизованных пользователей', async () => {
     const notValid: UserAuthentificationInputOptions = {
-      ...oneUserFindedinputOptions,
+      ...oneUserFindedInputOptions,
       caller: {
         type: 'DomainUser',
         userId: 'any user id',
