@@ -2,7 +2,7 @@ import { QueryUseCase } from 'rilata2/src/app/use-case/query-use-case';
 import { UcResult } from 'rilata2/src/app/use-case/types';
 import { TokenCreator } from 'rilata2/src/app/jwt/token-creator.interface';
 import {
-  ManyEmployeeAccountNotSupportedError, EmployeeUserDoesNotExistError,
+  ManyAccountNotSupportedError, TelegramUserDoesNotExistError,
   UserAuthentificationInputOptions, UserAuthentificationUCParams,
 } from 'workshop-domain/src/subject/domain-data/user/user-authentification/uc-params';
 import { userAuthentificationValidator } from 'workshop-domain/src/subject/domain-data/user/user-authentification/v-map';
@@ -26,25 +26,24 @@ export class UserAuthentificationUC extends QueryUseCase<UserAuthentificationUCP
     const userRepo = UserCmdRepository.instance(this.moduleResolver);
     const telegramId = options.actionDod.body.id;
     const users = await userRepo.findByTelegramId(telegramId);
-    const employeeUsers = users.filter((user) => user.getType() === 'employee');
 
-    if (employeeUsers.length > 1) {
-      const err: ManyEmployeeAccountNotSupportedError = dodUtility.getDomainErrorByType(
-        'TwoEmployeeAccountNotSupportedError',
-        'У вас с одним аккаунтом telegram имеется два пользовательских аккаунта сотрудников. К сожалению сейчас это не поддерживается. Обратитесь в техподдержку, чтобы вам помогли решить эту проблему.',
+    if (users.length > 1) {
+      const err: ManyAccountNotSupportedError = dodUtility.getDomainErrorByType(
+        'ManyAccountNotSupportedError',
+        'У вас с одним аккаунтом telegram имеется много аккаунтов, к сожалению сейчас это не поддерживается. Обратитесь в техподдержку, чтобы вам помогли решить эту проблему.',
         { telegramId },
       );
       return failure(err);
-    } if (employeeUsers.length === 0) {
-      const err: EmployeeUserDoesNotExistError = dodUtility.getDomainErrorByType(
-        'EmployeeUserDoesNotExistError',
-        'У вас нет аккаунта сотрудника.',
+    } if (users.length === 0) {
+      const err: TelegramUserDoesNotExistError = dodUtility.getDomainErrorByType(
+        'TelegramUserDoesNotExistError',
+        'У вас нет аккаунта.',
         { telegramId },
       );
       return failure(err);
     }
 
-    const userAr = employeeUsers[0];
+    const userAr = users[0];
 
     const userAuthQuery: UserAuthentificationDomainQuery = {
       botToken: this.moduleResolver.getRealisation('botToken') as string,

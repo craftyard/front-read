@@ -77,14 +77,6 @@ describe('user authentification use case tests', () => {
     hash: '94e3af7a0604b8494aa812f17159321958220291916aa78462c7cbc153d14056',
   };
 
-  const manyUserFindedInputOptions = {
-    ...oneUserFindedInputOptions,
-    actionDod: {
-      actionName: 'userAuthentification' as const,
-      body: manyUserFindedAuthQuery,
-    },
-  };
-
   test('успех, возвращен сгенерированный токен для одного сотрудника', async () => {
     resolveRealisationMock.mockClear();
     findByTelegramIdMock.mockClear();
@@ -104,9 +96,7 @@ describe('user authentification use case tests', () => {
     expect(resolveRealisationMock.mock.calls[1][0]).toBe(TokenCreator);
   });
 
-  test('успех, случаи когда один сотрудник и один клиент', async () => {
-    resolveRealisationMock.mockClear();
-
+  test('провал, случаи когда один сотрудник и один клиент', async () => {
     const findByTelegramIdTwoUserMock = spyOn(
       resolver.getRepository(UserCmdRepository),
       'findByTelegramId',
@@ -122,31 +112,38 @@ describe('user authentification use case tests', () => {
       },
     );
     findByTelegramIdTwoUserMock.mockClear();
-
-    const result = await sut.execute(manyUserFindedInputOptions);
-    expect(result.isSuccess()).toBe(true);
-    expect(result.value).toEqual({
-      accessToken: 'some access token',
-      refreshToken: 'some refresh token',
-    });
-
-    expect(findByTelegramIdTwoUserMock).toHaveBeenCalledTimes(1);
-    expect(findByTelegramIdTwoUserMock.mock.calls[0][0]).toBe(5436134100);
-
-    expect(resolveRealisationMock).toHaveBeenCalledTimes(2);
-    expect(resolveRealisationMock.mock.calls[0][0]).toBe('botToken');
-    expect(resolveRealisationMock.mock.calls[1][0]).toBe(TokenCreator);
-  });
-
-  test('провал, два сотрудника и один клиент, функционал еще не реализован', async () => {
-    findByTelegramIdMock.mockClear();
+    const manyUserFindedInputOptions = { ...oneUserFindedInputOptions };
+    manyUserFindedInputOptions.actionDod.body = manyUserFindedAuthQuery;
 
     const result = await sut.execute(manyUserFindedInputOptions);
     expect(result.isFailure()).toBe(true);
     expect(result.value).toEqual({
-      name: 'TwoEmployeeAccountNotSupportedError',
+      name: 'ManyAccountNotSupportedError',
       locale: {
-        text: 'У вас с одним аккаунтом telegram имеется два пользовательских аккаунта сотрудников. К сожалению сейчас это не поддерживается. Обратитесь в техподдержку, чтобы вам помогли решить эту проблему.',
+        text: 'У вас с одним аккаунтом telegram имеется много аккаунтов, к сожалению сейчас это не поддерживается. Обратитесь в техподдержку, чтобы вам помогли решить эту проблему.',
+        hint: {
+          telegramId: 5436134100,
+        },
+      },
+      errorType: 'domain-error',
+      domainType: 'error',
+    });
+
+    expect(findByTelegramIdTwoUserMock).toHaveBeenCalledTimes(1);
+    expect(findByTelegramIdTwoUserMock.mock.calls[0][0]).toBe(5436134100);
+  });
+
+  test('провал, два сотрудника и один клиент, функционал еще не реализован', async () => {
+    findByTelegramIdMock.mockClear();
+    const manyUserFindedInputOptions = { ...oneUserFindedInputOptions };
+    manyUserFindedInputOptions.actionDod.body = manyUserFindedAuthQuery;
+
+    const result = await sut.execute(manyUserFindedInputOptions);
+    expect(result.isFailure()).toBe(true);
+    expect(result.value).toEqual({
+      name: 'ManyAccountNotSupportedError',
+      locale: {
+        text: 'У вас с одним аккаунтом telegram имеется много аккаунтов, к сожалению сейчас это не поддерживается. Обратитесь в техподдержку, чтобы вам помогли решить эту проблему.',
         hint: {
           telegramId: 5436134100,
         },
@@ -159,41 +156,27 @@ describe('user authentification use case tests', () => {
     expect(findByTelegramIdMock.mock.calls[0][0]).toBe(5436134100);
   });
 
-  test('провал, случаи когда пользователь является только клиентом, а usecase только для сотрудников', async () => {
-    resolveRealisationMock.mockClear();
+  test('провал, случай когда пользователь не найден', async () => {
+    findByTelegramIdMock.mockClear();
+    const notFoundUserInputOptions = { ...oneUserFindedInputOptions };
+    notFoundUserInputOptions.actionDod.body.id = 67932088504;
 
-    const findByTelegramIdOneUserMock = spyOn(
-      resolver.getRepository(UserCmdRepository),
-      'findByTelegramId',
-    ).mockImplementationOnce(
-      async (telegramId: TelegramId) => {
-        const shiftedUserRecords = dtoUtility.deepCopy(testUsersRecords).slice(2);
-        return shiftedUserRecords
-          .filter((userRecord) => userRecord.telegramId === telegramId)
-          .map((userRecord) => {
-            const userAttrs = dtoUtility.excludeAttrs(userRecord, 'version');
-            return new UserAR(userAttrs, userRecord.version, resolver.getLogger());
-          });
-      },
-    );
-    findByTelegramIdOneUserMock.mockClear();
-
-    const result = await sut.execute(manyUserFindedInputOptions);
+    const result = await sut.execute(notFoundUserInputOptions);
     expect(result.isFailure()).toBe(true);
     expect(result.value).toEqual({
-      name: 'EmployeeUserDoesNotExistError',
+      name: 'TelegramUserDoesNotExistError',
       locale: {
-        text: 'У вас нет аккаунта сотрудника.',
+        text: 'У вас нет аккаунта.',
         hint: {
-          telegramId: 5436134100,
+          telegramId: 67932088504,
         },
       },
       errorType: 'domain-error',
       domainType: 'error',
     });
 
-    expect(findByTelegramIdOneUserMock).toHaveBeenCalledTimes(1);
-    expect(findByTelegramIdOneUserMock.mock.calls[0][0]).toBe(5436134100);
+    expect(findByTelegramIdMock).toHaveBeenCalledTimes(1);
+    expect(findByTelegramIdMock.mock.calls[0][0]).toBe(67932088504);
   });
 
   test('провал, не прошла валидация', async () => {
