@@ -1,15 +1,15 @@
-import { QueryUseCase } from 'rilata2/src/app/use-case/query-use-case';
-import { UcResult } from 'rilata2/src/app/use-case/types';
-import { TokenCreator } from 'rilata2/src/app/jwt/token-creator.interface';
+import { QueryUseCase } from 'rilata/src/app/use-case/query-use-case';
+import { UcResult } from 'rilata/src/app/use-case/types';
+import { TokenCreator } from 'rilata/src/app/jwt/token-creator.interface';
 import {
   ManyAccountNotSupportedError, TelegramUserDoesNotExistError,
   UserAuthentificationInputOptions, UserAuthentificationUCParams,
-} from 'workshop-domain/src/subject/domain-data/user/user-authentification/uc-params';
-import { userAuthentificationValidator } from 'workshop-domain/src/subject/domain-data/user/user-authentification/v-map';
-import { UserCmdRepository } from 'workshop-domain/src/subject/domain-object/user/cmd-repository';
-import { UserAuthentificationDomainQuery } from 'workshop-domain/src/subject/domain-data/user/user-authentification/a-params';
-import { failure } from 'rilata2/src/common/result/failure';
-import { dodUtility } from 'rilata2/src/common/utils/domain-object/dod-utility';
+} from 'cy-domain/src/subject/domain-data/user/user-authentification/uc-params';
+import { userAuthentificationValidator } from 'cy-domain/src/subject/domain-data/user/user-authentification/v-map';
+import { UserCmdRepository } from 'cy-domain/src/subject/domain-object/user/cmd-repository';
+import { UserAuthentificationDomainQuery } from 'cy-domain/src/subject/domain-data/user/user-authentification/a-params';
+import { failure } from 'rilata/src/common/result/failure';
+import { dodUtility } from 'rilata/src/common/utils/domain-object/dod-utility';
 
 export class UserAuthentificationUC extends QueryUseCase<UserAuthentificationUCParams> {
   protected name: 'userAuthentification' = 'userAuthentification' as const;

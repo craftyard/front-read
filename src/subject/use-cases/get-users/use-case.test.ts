@@ -2,8 +2,8 @@
 import {
   describe, test, expect, spyOn,
 } from 'bun:test';
-import { GetUsersInputOptions, GetingUsersOut } from 'workshop-domain/src/subject/domain-data/user/get-users/uc-params';
-import { UserAttrs } from 'workshop-domain/src/subject/domain-data/user/params';
+import { GetUsersInputOptions, GetingUsersOut } from 'cy-domain/src/subject/domain-data/user/get-users/uc-params';
+import { UserAttrs } from 'cy-domain/src/subject/domain-data/user/params';
 import { GettingUserUC } from './use-case';
 import { SubjectUseCaseFixtures as fixtures } from '../fixtures';
 

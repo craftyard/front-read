@@ -1,5 +1,5 @@
 {
-  "name": "read",
+  "name": "cy-front-read",
   "version": "0.0.1",
   "description": "Репозитории для чтение данных с бэкенда",
   "author": "GIS-Expert",
@@ -20,11 +20,11 @@
     "@nestjs/common": "^10.0.0",
     "@nestjs/core": "^10.0.0",
     "@nestjs/platform-express": "^10.0.0",
-    "craft-yard-backend": "git+https://github.com/soul-workshop/craft-yard-backend",
+    "backend-core": "git+https://github.com/craftyard/backend-core",
     "express": "^4.18.2",
     "reflect-metadata": "^0.1.13",
-    "rilata2": "git+https://github.com/soul-workshop/rilata2",
-    "workshop-domain": "git+https://github.com/soul-workshop/domain"
+    "rilata": "git+https://github.com/craftyard/rilata-core",
+    "cy-domain": "git+https://github.com/craftyard/domain"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",
