@@ -2,43 +2,14 @@
 import {
   describe, test, expect, spyOn,
 } from 'bun:test';
-import { ConsoleLogger } from 'rilata2/src/common/logger/console-logger';
-import { GetUsersInputOptions, GetingUsersOut } from 'workshop-domain/src/subject/domain-data/user/get-users/uc-params';
-import { UserAttrs } from 'workshop-domain/src/subject/domain-data/user/params';
-import { ModuleResolver } from 'rilata2/src/conf/module-resolver';
-import { Logger } from 'rilata2/src/common/logger/logger';
-import { UserRepository } from 'workshop-domain/src/subject/domain-object/user/repository';
+import { GetUsersInputOptions, GetingUsersOut } from 'cy-domain/src/subject/domain-data/user/get-users/uc-params';
+import { UserAttrs } from 'cy-domain/src/subject/domain-data/user/params';
 import { GettingUserUC } from './use-case';
-
-export class UserRepoMock implements UserRepository {
-  getUsers(userIds: string[]): Promise<UserAttrs[]> {
-    throw new Error('Method not implemented.');
-  }
-
-  findByTelegramId(telegramId: number): Promise<UserAttrs[]> {
-    throw new Error('Method not implemented.');
-  }
-}
-
-export class ResolverMock implements ModuleResolver {
-  private repoMock = new UserRepoMock();
-
-  getLogger(): Logger {
-    return new ConsoleLogger();
-  }
-
-  getRepository(repoKey: unknown): UserRepository {
-    return this.repoMock;
-  }
-
-  getRealisation(...args: unknown[]): unknown {
-    throw new Error('Method not implemented.');
-  }
-}
+import { SubjectUseCaseFixtures as fixtures } from '../fixtures';
 
 describe('тесты для use-case getUsers', () => {
   const sut = new GettingUserUC();
-  const resolver = new ResolverMock();
+  const resolver = new fixtures.ResolverMock();
   sut.init(resolver);
 
   const validInputOptions: GetUsersInputOptions = {
