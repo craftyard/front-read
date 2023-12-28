@@ -3,11 +3,10 @@ import {
 } from 'bun:test';
 import { storeDispatcher } from 'rilata/src/app/async-store/store-dispatcher';
 import { dtoUtility } from 'rilata/src/common/utils/dto/dto-utility';
-import { GetMyWorkshopOut } from 'cy-domain/src/workshop/domain-data/workshop/get-my-workshop/s-params';
 import { FindWorkshopByUserIdService } from './service';
 import {
   ResolverMock, workshop, domainUserThreadStore, inputOptions, anonymousUserThreadStore,
-} from '../fixture';
+} from './fixture';
 
 describe('Тесты для use-case getMyWorkshop', () => {
   const sut = new FindWorkshopByUserIdService();
@@ -25,7 +24,7 @@ describe('Тесты для use-case getMyWorkshop', () => {
     storeDispatcher.setThreadStore(domainUserThreadStore);
     const result = await sut.execute(inputOptions);
     expect(result.isSuccess()).toBe(true);
-    expect(result.value as GetMyWorkshopOut).toEqual({
+    expect(result.value).toEqual({
       workshopId: '6f91d305-3f4b-4a3d-9bef-72cf3757cc33',
       name: 'Nurbolat',
       city: 'Freital',
@@ -35,7 +34,6 @@ describe('Тесты для use-case getMyWorkshop', () => {
     });
     expect(getWorkshopMock).toHaveBeenCalledTimes(1);
     expect(getWorkshopMock.mock.calls[0][0]).toBe('fb8a83cf-25a3-2b4f-86e1-27f6de6d8374');
-    getWorkshopMock.mockClear();
   });
 
   test('провал, для текущего пользователя мастерская не найдена', async () => {
@@ -75,5 +73,6 @@ describe('Тесты для use-case getMyWorkshop', () => {
         domainType: 'error',
       },
     });
+    expect(getWorkshopMock).toHaveBeenCalledTimes(0);
   });
 });
