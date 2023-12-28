@@ -9,7 +9,7 @@ import { failure } from 'rilata/src/common/result/failure';
 import { dodUtility } from 'rilata/src/common/utils/domain-object/dod-utility';
 import { storeDispatcher } from 'rilata/src/app/async-store/store-dispatcher';
 
-export class FindWorkshopByUserIdUC extends QueryService<GetMyWorkshopServiceParams> {
+export class FindWorkshopByUserIdService extends QueryService<GetMyWorkshopServiceParams> {
   protected aRootName: 'WorkshopAR';
 
   protected name: 'getMyWorkshop' = 'getMyWorkshop' as const;

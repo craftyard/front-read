@@ -4,7 +4,7 @@ import {
 import { ConsoleLogger } from 'rilata/src/common/logger/console-logger';
 import { GetMyWorkshopActionDod, GetMyWorkshopOut, WorkshopForUserDoesntExistError } from 'cy-domain/src/workshop/domain-data/workshop/get-my-workshop/s-params';
 import { Logger } from 'rilata/src/common/logger/logger';
-import { WorkshopRepository } from 'cy-domain/src/workshop/domain-object/workshop/repository';
+import { WorkshopReadRepository } from 'cy-domain/src/workshop/domain-object/workshop/repository';
 import { WorkshopAttrs } from 'cy-domain/src/workshop/domain-data/workshop/params';
 import { Database } from 'rilata/src/app/database';
 import { ModuleResolver } from 'rilata/src/app/resolves/module-resolver';
@@ -15,9 +15,10 @@ import { AnonymousUser, DomainUser } from 'rilata/src/app/caller';
 import { UuidType } from 'rilata/src/common/types';
 import { StorePayload, ThreadStore } from 'rilata/src/app/async-store/types';
 import { storeDispatcher } from 'rilata/src/app/async-store/store-dispatcher';
-import { FindWorkshopByUserIdUC } from './use-case';
+import { dtoUtility } from 'rilata/src/common/utils/dto/dto-utility';
+import { FindWorkshopByUserIdService } from './service';
 
-export class WorkshopRepoMock implements WorkshopRepository {
+export class WorkshopRepoMock implements WorkshopReadRepository {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   findWorkshopByUserId(userId: string): Promise<WorkshopAttrs | undefined> {
     throw new Error('Method not implemented.');
@@ -41,7 +42,7 @@ export class ResolverMock implements ModuleResolver {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  getRepository(repoKey: unknown): WorkshopRepository {
+  getRepository(repoKey: unknown): WorkshopReadRepository {
     return this.repoMock;
   }
 
@@ -99,7 +100,7 @@ const anonymousUserThreadStore: ThreadStore<StorePayload> = {
 };
 
 describe('Тесты для use-case getMyWorkshop', () => {
-  const sut = new FindWorkshopByUserIdUC();
+  const sut = new FindWorkshopByUserIdService();
   const resolver = new ResolverMock();
   sut.init(resolver);
 
@@ -145,7 +146,7 @@ describe('Тесты для use-case getMyWorkshop', () => {
     const getWorkshopMock = spyOn(
       resolver.getRepository('repoKey'),
       'findWorkshopByUserId',
-    ).mockResolvedValueOnce(workshop);
+    ).mockResolvedValueOnce(dtoUtility.deepCopy(workshop));
     storeDispatcher.setThreadStore(domainUserThreadStore);
     const result = await sut.execute(validInputOptions);
     expect(result.isSuccess()).toBe(true);
