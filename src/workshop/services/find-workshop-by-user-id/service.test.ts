@@ -153,6 +153,7 @@ describe('Тесты для use-case getMyWorkshop', () => {
     expect(result.value as GetMyWorkshopOut).toEqual(workshop);
     expect(getWorkshopMock).toHaveBeenCalledTimes(1);
     expect(getWorkshopMock.mock.calls[0][0]).toBe('fb8a83cf-25a3-2b4f-86e1-27f6de6d8374');
+    getWorkshopMock.mockClear();
   });
 
   test('провал, для текущего пользователя мастерская не найдена', async () => {
@@ -174,8 +175,9 @@ describe('Тесты для use-case getMyWorkshop', () => {
         errorType: 'domain-error',
       },
     });
-    expect(getWorkshopMock).toHaveBeenCalledTimes(2);
+    expect(getWorkshopMock).toHaveBeenCalledTimes(1);
     expect(getWorkshopMock.mock.calls[0][0]).toBe('fb8a83cf-25a3-2b4f-86e1-27f6de6d8374');
+    getWorkshopMock.mockClear();
   });
 
   test('провал, запрещен доступ неавторизованному пользователю', async () => {
