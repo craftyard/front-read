@@ -13,12 +13,15 @@ describe('Тесты для use-case getMyWorkshop', () => {
   const sut = new FindWorkshopByUserIdService();
   const resolver = new ResolverMock();
   sut.init(resolver);
-
+  const getWorkshopMock = spyOn(
+    resolver.getRepository('repoKey'),
+    'findWorkshopByUserId',
+  );
+  afterEach(() => {
+    getWorkshopMock.mockClear();
+  });
   test('успех, запрос для получения workshop-а успешно проходит', async () => {
-    const getWorkshopMock = spyOn(
-      resolver.getRepository('repoKey'),
-      'findWorkshopByUserId',
-    ).mockResolvedValueOnce(dtoUtility.deepCopy(workshop));
+    getWorkshopMock.mockResolvedValueOnce(dtoUtility.deepCopy(workshop));
     storeDispatcher.setThreadStore(domainUserThreadStore);
     const result = await sut.execute(inputOptions);
     expect(result.isSuccess()).toBe(true);
@@ -32,16 +35,11 @@ describe('Тесты для use-case getMyWorkshop', () => {
     });
     expect(getWorkshopMock).toHaveBeenCalledTimes(1);
     expect(getWorkshopMock.mock.calls[0][0]).toBe('fb8a83cf-25a3-2b4f-86e1-27f6de6d8374');
-    afterEach(() => {
-      getWorkshopMock.mockClear();
-    });
+    getWorkshopMock.mockClear();
   });
 
   test('провал, для текущего пользователя мастерская не найдена', async () => {
-    const getWorkshopMock = spyOn(
-      resolver.getRepository('repoKey'),
-      'findWorkshopByUserId',
-    ).mockResolvedValueOnce(undefined);
+    getWorkshopMock.mockResolvedValueOnce(undefined);
     storeDispatcher.setThreadStore(domainUserThreadStore);
     const result = await sut.execute(inputOptions);
     expect(result.isFailure()).toBe(true);
@@ -58,9 +56,6 @@ describe('Тесты для use-case getMyWorkshop', () => {
     });
     expect(getWorkshopMock).toHaveBeenCalledTimes(1);
     expect(getWorkshopMock.mock.calls[0][0]).toBe('fb8a83cf-25a3-2b4f-86e1-27f6de6d8374');
-    afterEach(() => {
-      getWorkshopMock.mockClear();
-    });
   });
 
   test('провал, запрещен доступ неавторизованному пользователю', async () => {
