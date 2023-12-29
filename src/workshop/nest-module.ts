@@ -2,7 +2,7 @@ import { Module, DynamicModule } from '@nestjs/common';
 import { RunMode } from 'rilata/src/app/types';
 import { Logger } from 'rilata/src/common/logger/logger';
 import { WorkshopResolver } from 'cy-domain/src/workshop/resolver';
-import workshopsJson from 'cy-domain/src/workshop/domain-data/workshop/workshops.json';
+import arrayWorkshops from 'cy-domain/src/workshop/domain-data/workshop/workshops.json';
 import { WorkshopJsonRepository } from 'cy-domain/src/workshop/domain-object/workshop/json-impl/repo';
 import { JSONWebTokenLibJWTManager } from 'backend-core/src/infra/jwt/jsonwebtoken-lib.jwt.manager';
 import { WorkshopReadModule } from './module';
@@ -15,7 +15,8 @@ export class WorkshopReadNestModule {
     jwtManager: JSONWebTokenLibJWTManager,
     runMode: RunMode,
   ): DynamicModule {
-    const workshopReadRepo = new WorkshopJsonRepository(workshopsJson as unknown as string, logger);
+    const jsonWorkshops = JSON.stringify(arrayWorkshops);
+    const workshopReadRepo = new WorkshopJsonRepository(jsonWorkshops, logger);
 
     const workshopResolver = new WorkshopResolver(workshopReadRepo, logger, runMode, jwtManager);
     return {

@@ -1,7 +1,7 @@
 import { DynamicModule, Module } from '@nestjs/common';
 import { Logger } from 'rilata/src/common/logger/logger';
 import { SubjectResolver } from 'cy-domain/src/subject/resolver';
-import user from 'cy-domain/src/subject/domain-data/user/users.json';
+import arrayUsers from 'cy-domain/src/subject/domain-data/user/users.json';
 import { UserJsonRepository } from 'cy-domain/src/subject/domain-object/user/json-impl/repo';
 import { JSONWebTokenLibJWTManager } from 'backend-core/src/infra/jwt/jsonwebtoken-lib.jwt.manager';
 import { RunMode } from 'rilata/src/app/types';
@@ -15,8 +15,8 @@ export class SubjectReadNestModule {
     jwtManager: JSONWebTokenLibJWTManager,
     runMode: RunMode,
   ): DynamicModule {
-    const userRepo = new UserJsonRepository(user as unknown as string, logger);
-
+    const jsonUsers = JSON.stringify(arrayUsers);
+    const userRepo = new UserJsonRepository(jsonUsers, logger);
     const subjectResolver = new SubjectResolver(jwtManager, userRepo, logger, runMode);
     return {
       module: SubjectReadNestModule,
