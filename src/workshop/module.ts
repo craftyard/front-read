@@ -10,7 +10,7 @@ export class WorkshopReadModule extends Module {
     new FindWorkshopByUserIdService() as unknown as GeneraQueryService,
   ];
 
-  commandServices: GeneralCommandService[];
+  commandServices: GeneralCommandService[] = [];
 
   moduleType: ModuleType = 'read-module';
 
