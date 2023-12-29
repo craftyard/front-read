@@ -2,18 +2,19 @@ import { Logger } from 'rilata/src/common/logger/logger';
 import { ConsoleLogger } from 'rilata/src/common/logger/console-logger';
 import { GetMyWorkshopActionDod } from 'cy-domain/src/workshop/domain-data/workshop/get-my-workshop/s-params';
 import { WorkshopAttrs } from 'cy-domain/src/workshop/domain-data/workshop/params';
-import { WorkshopReadRepository } from 'cy-domain/src/workshop/domain-object/workshop/repository';
+import { WorkshopRepository } from 'cy-domain/src/workshop/domain-object/workshop/repository';
 import { StorePayload, ThreadStore } from 'rilata/src/app/async-store/types';
 import { AnonymousUser, DomainUser } from 'rilata/src/app/caller';
 import { Database } from 'rilata/src/app/database';
 import { TokenVerifier } from 'rilata/src/app/jwt/token-verifier.interface';
 import { ModuleResolver } from 'rilata/src/app/resolves/module-resolver';
+import { RunMode } from 'rilata/src/app/types';
 import { UuidType } from 'rilata/src/common/types';
 import { DTO } from 'rilata/src/domain/dto';
 import { Module } from 'rilata/src/app/module/module';
 import { RunMode } from 'rilata/src/app/types';
 
-export class WorkshopRepoMock implements WorkshopReadRepository {
+export class WorkshopRepoMock implements WorkshopRepository {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   findWorkshopByUserId(userId: string): Promise<WorkshopAttrs | undefined> {
     throw new Error('Method not implemented.');
@@ -24,6 +25,10 @@ export class ResolverMock implements ModuleResolver {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   init(module: Module): void {
     throw new Error('Method not implemented.');
+  }
+
+  getRunMode(): RunMode {
+    return 'test';
   }
 
   getModule(): Module {
@@ -37,7 +42,7 @@ export class ResolverMock implements ModuleResolver {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  getRepository(repoKey: unknown): WorkshopReadRepository {
+  getRepository(repoKey: unknown): WorkshopRepository {
     return this.repoMock;
   }
 
