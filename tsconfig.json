@@ -1,22 +1,48 @@
+// +++++++ old config ++++++++
+// {
+//   "compilerOptions": {
+//     "types": ["bun-types"],
+//     "module": "commonjs",
+//     "declaration": true,
+//     "removeComments": true,
+//     "allowSyntheticDefaultImports": true,
+//     "target": "ES2021",
+//     "sourceMap": true,
+//     "outDir": "./dist",
+//     "baseUrl": "src",
+//     "incremental": true,
+//     "skipLibCheck": true,
+//     "strictNullChecks": false,
+//     "noImplicitAny": false,
+//     "strictBindCallApply": false,
+//     "forceConsistentCasingInFileNames": false,
+//     "noFallthroughCasesInSwitch": false
+//   }
+// }
+
+// +++++++ config by cy-domain ++++++++
 {
   "compilerOptions": {
-    "types": ["bun-types"],
-    "module": "commonjs",
-    "declaration": true,
-    "removeComments": true,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "allowSyntheticDefaultImports": true,
-    "target": "ES2021",
-    "sourceMap": true,
+    "types": [ "bun-types" ],
+
+    "lib": ["esnext"],
+    "module": "NodeNext",
+    "target": "esnext",
+
+    "moduleResolution": "nodeNext",
     "outDir": "./dist",
-    "baseUrl": "src",
-    "incremental": true,
+
+    "esModuleInterop": true,
+
+    "noErrorTruncation": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
-    "strictNullChecks": false,
-    "noImplicitAny": false,
-    "strictBindCallApply": false,
-    "forceConsistentCasingInFileNames": false,
-    "noFallthroughCasesInSwitch": false
-  }
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+  },
+  "include": [
+    "src/**/*",
+  ],
 }
+  

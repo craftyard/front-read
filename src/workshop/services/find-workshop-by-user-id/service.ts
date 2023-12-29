@@ -10,7 +10,7 @@ import { dodUtility } from 'rilata/src/common/utils/domain-object/dod-utility';
 import { storeDispatcher } from 'rilata/src/app/async-store/store-dispatcher';
 
 export class FindWorkshopByUserIdService extends QueryService<GetMyWorkshopServiceParams> {
-  protected aRootName: 'WorkshopAR';
+  protected aRootName: 'WorkshopAR' = 'WorkshopAR' as const;
 
   protected name: 'getMyWorkshop' = 'getMyWorkshop' as const;
 
@@ -20,7 +20,7 @@ export class FindWorkshopByUserIdService extends QueryService<GetMyWorkshopServi
 
   protected async runDomain(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    options: GetMyWorkshopActionDod,
+    actionDod: GetMyWorkshopActionDod,
   ): Promise<ServiceResult<GetMyWorkshopServiceParams>> {
     const repo = WorkshopRepository.instance(this.moduleResolver);
     const { caller } = storeDispatcher.getStoreOrExepction();
