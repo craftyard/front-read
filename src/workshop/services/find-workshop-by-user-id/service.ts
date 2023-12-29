@@ -1,7 +1,7 @@
 import { QueryService } from 'rilata/src/app/service/query-service';
-import { ServiceResult } from 'rilata/src/app/service/types';
+import { ActionDodValidator, ServiceResult } from 'rilata/src/app/service/types';
 import { GetMyWorkshopActionDod, GetMyWorkshopServiceParams, WorkshopForUserDoesntExistError } from 'cy-domain/src/workshop/domain-data/workshop/get-my-workshop/s-params';
-import { WorkshopRepository } from 'cy-domain/src/workshop/domain-object/workshop/repository';
+import { WorkshopReadRepository } from 'cy-domain/src/workshop/domain-object/workshop/repository';
 import { getMyWorkshopValidator } from 'cy-domain/src/workshop/domain-data/workshop/get-my-workshop/s-vmap';
 import { success } from 'rilata/src/common/result/success';
 import { DomainUser } from 'rilata/src/app/caller';
@@ -22,7 +22,7 @@ export class FindWorkshopByUserIdService extends QueryService<GetMyWorkshopServi
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     options: GetMyWorkshopActionDod,
   ): Promise<ServiceResult<GetMyWorkshopServiceParams>> {
-    const repo = WorkshopRepository.instance(this.moduleResolver);
+    const repo = WorkshopReadRepository.instance(this.moduleResolver);
     const { caller } = storeDispatcher.getStoreOrExepction();
     const workshop = await repo.findWorkshopByUserId((caller as DomainUser).userId);
     if (!workshop) {

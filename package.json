@@ -21,10 +21,10 @@
     "@nestjs/core": "^10.0.0",
     "@nestjs/platform-express": "^10.0.0",
     "backend-core": "git+https://github.com/craftyard/backend-core",
+    "cy-domain": "git@github.com:craftyard/domain.git",
     "express": "^4.18.2",
     "reflect-metadata": "^0.1.13",
-    "rilata": "git+https://github.com/craftyard/rilata-core",
-    "cy-domain": "git+https://github.com/craftyard/domain"
+    "rilata": "git@github.com:craftyard/rilata-core.git"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",
