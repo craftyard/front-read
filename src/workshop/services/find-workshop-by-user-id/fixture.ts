@@ -11,6 +11,7 @@ import { ModuleResolver } from 'rilata/src/app/resolves/module-resolver';
 import { UuidType } from 'rilata/src/common/types';
 import { DTO } from 'rilata/src/domain/dto';
 import { Module } from 'rilata/src/app/module/module';
+import { RunMode } from 'rilata/src/app/types';
 
 export class WorkshopRepoMock implements WorkshopReadRepository {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -20,6 +21,10 @@ export class WorkshopRepoMock implements WorkshopReadRepository {
 }
 
 export class ResolverMock implements ModuleResolver {
+  getRunMode(): RunMode {
+    throw new Error('Method not implemented.');
+  }
+
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   init(module: Module): void {
     throw new Error('Method not implemented.');
