@@ -1,9 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { ConsoleLogger } from 'rilata2/src/common/logger/console-logger';
-import { ModuleResolver } from 'rilata2/src/conf/module-resolver';
-import { Logger } from 'rilata2/src/common/logger/logger';
-import { UserRepository } from 'workshop-domain/src/subject/domain-object/user/repository';
-import { UserAttrs } from 'workshop-domain/src/subject/domain-data/user/params';
+import { ConsoleLogger } from 'rilata/src/common/logger/console-logger';
+import { Logger } from 'rilata/src/common/logger/logger';
+import { UserRepository } from 'cy-domain/src/subject/domain-object/user/repository';
+import { UserAttrs } from 'cy-domain/src/subject/domain-data/user/params';
 
 export namespace SubjectUseCaseFixtures {
   export class UserRepoMock implements UserRepository {

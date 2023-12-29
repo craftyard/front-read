@@ -2,10 +2,9 @@ import {
   Body, Controller, Post, Req, Res,
 } from '@nestjs/common';
 import { Response } from 'express';
-import { RequestCY } from 'craft-yard-backend/src/app/jwt/types';
-import { SubjectModule } from 'subject/module';
-import { ActionDod } from 'rilata2/src/domain/domain-object-data/common-types';
-import { Controller as ParentController } from 'rilata2/src/app/controller/controller';
+import { RequestCY } from 'backend-core/src/app/jwt/types';
+import { ActionDod } from 'rilata/src/domain/domain-data/domain-types';
+import { Controller as ParentController } from 'rilata/src/app/controller/controller';
 
 const SUBJECT_MODULE_ENDPOINT = 'subject/';
 
@@ -16,8 +15,7 @@ export class SubjectController extends ParentController {
     @Body() body: ActionDod,
     @Res({ passthrough: true }) response: Response,
     @Req() req: RequestCY,
-      module: SubjectModule,
   ): Promise<void> {
-    return this.executeUseCase(body, req.user, module, response);
+    return this.executeService(body, req.user, response);
   }
 }

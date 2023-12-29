@@ -2,16 +2,16 @@
 import {
   describe, test, expect, spyOn, beforeAll, afterAll,
 } from 'bun:test';
-import { JWTTokens } from 'rilata2/src/app/jwt/types';
-import { TokenCreator } from 'rilata2/src/app/jwt/token-creator.interface';
-import { TelegramAuthDTO } from 'workshop-domain/src/subject/domain-data/user/user-authentification/a-params';
-import { UserAuthentificationInputOptions } from 'workshop-domain/src/subject/domain-data/user/user-authentification/uc-params';
-import { UserCmdRepository } from 'workshop-domain/src/subject/domain-object/user/cmd-repository';
-import { testUsersRecords } from 'workshop-domain/src/subject/domain-object/user/json-impl/fixture';
-import { TelegramId } from 'workshop-domain/src/types';
-import { UserAR } from 'workshop-domain/src/subject/domain-object/user/a-root';
-import { dtoUtility } from 'rilata2/src/common/utils/dto/dto-utility';
-import { UserAuthentificationUC } from './use-case';
+import { JWTTokens } from 'rilata/src/app/jwt/types';
+import { TokenCreator } from 'rilata/src/app/jwt/token-creator.interface';
+import { TelegramAuthDTO } from 'cy-domain/src/subject/domain-data/user/user-authentification/a-params';
+import { UserAuthentificationInputOptions } from 'cy-domain/src/subject/domain-data/user/user-authentification/s-params';
+import { UserCmdRepository } from 'cy-domain/src/subject/domain-object/user/cmd-repository';
+import { testUsersRecords } from 'cy-domain/src/subject/domain-object/user/json-impl/fixture';
+import { TelegramId } from 'cy-domain/src/types';
+import { UserAR } from 'cy-domain/src/subject/domain-object/user/a-root';
+import { dtoUtility } from 'rilata/src/common/utils/dto/dto-utility';
+import { UserAuthentificationService } from './use-case';
 import { SubjectUseCaseFixtures } from '../fixtures';
 
 describe('user authentification use case tests', () => {
@@ -24,7 +24,7 @@ describe('user authentification use case tests', () => {
     UserAR.prototype.getNowDate = getNowOriginal;
   });
 
-  const sut = new UserAuthentificationUC();
+  const sut = new UserAuthentificationService();
   const resolver = new SubjectUseCaseFixtures.ResolverMock();
   const tokenCreatorMock = {
     createToken(): JWTTokens {

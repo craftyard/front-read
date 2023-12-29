@@ -12,6 +12,7 @@
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
+    "tslint": "bun tsc --noEmit",
     "test:unit": "bun test .test.ts",
     "test:int": "bun test .i.test.ts",
     "test:e2e": "bun test .e2e.test.ts"
@@ -20,11 +21,11 @@
     "@nestjs/common": "^10.0.0",
     "@nestjs/core": "^10.0.0",
     "@nestjs/platform-express": "^10.0.0",
-    "craft-yard-backend": "git+https://github.com/soul-workshop/craft-yard-backend",
+    "backend-core": "git+https://github.com/soul-workshop/craft-yard-backend",
+    "cy-domain": "git+https://github.com/soul-workshop/domain",
     "express": "^4.18.2",
     "reflect-metadata": "^0.1.13",
-    "rilata2": "git+https://github.com/soul-workshop/rilata2",
-    "workshop-domain": "git+https://github.com/soul-workshop/domain"
+    "rilata": "git+https://github.com/soul-workshop/rilata"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",
