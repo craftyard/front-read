@@ -1,11 +1,11 @@
 import {
   Body, Controller, Post, Req, Res,
 } from '@nestjs/common';
-import { RequestCY } from 'backend-core/src/app/jwt/types';
 import { Response } from 'express';
 import { ActionDod } from 'rilata/src/domain/domain-data/domain-types';
 import { Controller as ParentController } from 'rilata/src/app/controller/controller';
-import { ModuleResolver } from 'rilata/src/app/resolves/module-resolver';
+import { RequestCY } from 'backend-core/src/app/jwt/types';
+import { WorkshopResolver } from 'cy-domain/src/workshop/resolver';
 
 const WORKSHOP_MODULE_ENDPOINT = 'workshop/';
 
@@ -16,8 +16,8 @@ export class WorkshopController extends ParentController {
       @Body() body: ActionDod,
       @Res({ passthrough: true }) response: Response,
       @Req() req: RequestCY,
-        moduleResolver: ModuleResolver,
+        workshopResolver: WorkshopResolver,
   ): Promise<void> {
-    return this.execute(body, response, req, moduleResolver);
+    return this.execute(body, response, req, workshopResolver);
   }
 }
