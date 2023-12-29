@@ -62,6 +62,10 @@ export class ResolverMock implements ModuleResolver {
   getTokenVerifier(): TokenVerifier<DTO> {
     throw new Error('Method not implemented.');
   }
+
+  getRunMode(): RunMode {
+    throw new Error('Method not implemented.');
+  }
 }
 
 const domainUser: DomainUser = {

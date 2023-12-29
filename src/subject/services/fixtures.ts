@@ -11,6 +11,10 @@ import { TokenVerifier } from 'rilata/src/app/jwt/token-verifier.interface';
 import { Module } from 'rilata/src/app/module/module';
 import { RunMode } from 'rilata/src/app/types';
 import { DTO } from 'rilata/src/domain/dto';
+import { UuidType } from 'rilata/src/common/types';
+import { StorePayload, ThreadStore } from 'rilata/src/app/async-store/types';
+import { AnonymousUser, DomainUser } from 'rilata/src/app/caller';
+import { GetUsersActionDod } from 'cy-domain/src/subject/domain-data/user/get-users/s-params';
 
 export namespace SubjectUseCaseFixtures {
   export class UserRepoMock implements UserCmdRepository, UserReadRepository {
@@ -58,4 +62,57 @@ export namespace SubjectUseCaseFixtures {
       throw new Error('Method not implemented.');
     }
   }
+
+  export const validActionDod: GetUsersActionDod = {
+    meta: {
+      name: 'getUsers',
+      actionId: 'd98f438a-c697-4da1-8245-fe993cf820c4',
+      domainType: 'action',
+    },
+    attrs: {
+      userIds: [
+        'fa91a299-105b-4fb0-a056-92634249130c',
+        '493f5cbc-f572-4469-9cf1-3702802e6a31',
+      ],
+    },
+  };
+
+  const domainUser: DomainUser = {
+    type: 'DomainUser',
+    userId: 'fb8a83cf-25a3-2b4f-86e1-27f6de6d8374',
+  };
+
+  const moduleResolver: ModuleResolver = new ResolverMock();
+
+  const actionId: UuidType = 'pb8a83cf-25a3-2b4f-86e1-2744de6d8374';
+
+  const domainUserStorePayload: StorePayload = {
+    caller: domainUser,
+    moduleResolver,
+    actionId,
+  };
+
+  export const domainUserThreadStore: ThreadStore<StorePayload> = {
+    run: () => {
+      throw new Error('Method not implemented.');
+    },
+    getStore: () => domainUserStorePayload,
+  };
+
+  const anonymousUser:AnonymousUser = {
+    type: 'AnonymousUser',
+  };
+
+  const anonymousUserStorePayload: StorePayload = {
+    caller: anonymousUser,
+    moduleResolver,
+    actionId,
+  };
+
+  export const anonymousUserThreadStore: ThreadStore<StorePayload> = {
+    run: () => {
+      throw new Error('Method not implemented.');
+    },
+    getStore: () => anonymousUserStorePayload,
+  };
 }
