@@ -4,14 +4,15 @@ import {
 } from 'bun:test';
 import { JWTTokens } from 'rilata/src/app/jwt/types';
 import { TokenCreator } from 'rilata/src/app/jwt/token-creator.interface';
+import { uuidUtility } from 'rilata/src/common/utils/uuid/uuid-utility';
+import { dtoUtility } from 'rilata/src/common/utils/dto/dto-utility';
 import { TelegramAuthDTO } from 'cy-domain/src/subject/domain-data/user/user-authentification/a-params';
-import { UserAuthentificationInputOptions } from 'cy-domain/src/subject/domain-data/user/user-authentification/s-params';
 import { UserCmdRepository } from 'cy-domain/src/subject/domain-object/user/cmd-repository';
 import { testUsersRecords } from 'cy-domain/src/subject/domain-object/user/json-impl/fixture';
 import { TelegramId } from 'cy-domain/src/types';
+import { UserAuthentificationActionDod } from 'cy-domain/src/subject/domain-data/user/user-authentification/s-params';
 import { UserAR } from 'cy-domain/src/subject/domain-object/user/a-root';
-import { dtoUtility } from 'rilata/src/common/utils/dto/dto-utility';
-import { UserAuthentificationService } from './use-case';
+import { UserAuthentificationService } from './service';
 import { SubjectUseCaseFixtures } from '../fixtures';
 
 describe('user authentification use case tests', () => {
@@ -60,15 +61,13 @@ describe('user authentification use case tests', () => {
     auth_date: new Date('2021-01-01').getTime() - 1000,
     hash: '69d4ebba0b28a1b88634ef973918deffcf75d08d87f683677efb18baebc73c4d',
   };
-  const oneUserFindedInputOptions: UserAuthentificationInputOptions = {
-    actionDod: {
-      actionName: 'userAuthentification',
-      body: oneUserFindedAuthQuery,
+  const oneUserFindedActionDod: UserAuthentificationActionDod = {
+    meta: {
+      name: 'userAuthentification',
+      actionId: uuidUtility.getNewUUID(),
+      domainType: 'action',
     },
-    caller: {
-      type: 'AnonymousUser',
-      requestID: '',
-    },
+    attrs: oneUserFindedAuthQuery,
   };
 
   const manyUserFindedAuthQuery: TelegramAuthDTO = {
@@ -81,7 +80,7 @@ describe('user authentification use case tests', () => {
     resolveRealisationMock.mockClear();
     findByTelegramIdMock.mockClear();
 
-    const result = await sut.execute(oneUserFindedInputOptions);
+    const result = await sut.execute(oneUserFindedActionDod);
     expect(result.isSuccess()).toBe(true);
     expect(result.value).toEqual({
       accessToken: 'some access token',
@@ -112,21 +111,23 @@ describe('user authentification use case tests', () => {
       },
     );
     findByTelegramIdTwoUserMock.mockClear();
-    const manyUserFindedInputOptions = { ...oneUserFindedInputOptions };
-    manyUserFindedInputOptions.actionDod.body = manyUserFindedAuthQuery;
+    const manyUserFindedActionDod = { ...oneUserFindedActionDod };
+    manyUserFindedActionDod.attrs = manyUserFindedAuthQuery;
 
-    const result = await sut.execute(manyUserFindedInputOptions);
+    const result = await sut.execute(manyUserFindedActionDod);
     expect(result.isFailure()).toBe(true);
     expect(result.value).toEqual({
-      name: 'ManyAccountNotSupportedError',
       locale: {
         text: 'У вас с одним аккаунтом telegram имеется много аккаунтов, к сожалению сейчас это не поддерживается. Обратитесь в техподдержку, чтобы вам помогли решить эту проблему.',
         hint: {
           telegramId: 5436134100,
         },
       },
-      errorType: 'domain-error',
-      domainType: 'error',
+      meta: {
+        name: 'ManyAccountNotSupportedError',
+        errorType: 'domain-error',
+        domainType: 'error',
+      },
     });
 
     expect(findByTelegramIdTwoUserMock).toHaveBeenCalledTimes(1);
@@ -135,21 +136,23 @@ describe('user authentification use case tests', () => {
 
   test('провал, два сотрудника и один клиент, функционал еще не реализован', async () => {
     findByTelegramIdMock.mockClear();
-    const manyUserFindedInputOptions = { ...oneUserFindedInputOptions };
-    manyUserFindedInputOptions.actionDod.body = manyUserFindedAuthQuery;
+    const manyUserFindedActionDod = { ...oneUserFindedActionDod };
+    manyUserFindedActionDod.attrs = manyUserFindedAuthQuery;
 
-    const result = await sut.execute(manyUserFindedInputOptions);
+    const result = await sut.execute(manyUserFindedActionDod);
     expect(result.isFailure()).toBe(true);
     expect(result.value).toEqual({
-      name: 'ManyAccountNotSupportedError',
       locale: {
         text: 'У вас с одним аккаунтом telegram имеется много аккаунтов, к сожалению сейчас это не поддерживается. Обратитесь в техподдержку, чтобы вам помогли решить эту проблему.',
         hint: {
           telegramId: 5436134100,
         },
       },
-      errorType: 'domain-error',
-      domainType: 'error',
+      meta: {
+        name: 'ManyAccountNotSupportedError',
+        errorType: 'domain-error',
+        domainType: 'error',
+      },
     });
 
     expect(findByTelegramIdMock).toHaveBeenCalledTimes(1);
@@ -158,21 +161,23 @@ describe('user authentification use case tests', () => {
 
   test('провал, случай когда пользователь не найден', async () => {
     findByTelegramIdMock.mockClear();
-    const notFoundUserInputOptions = { ...oneUserFindedInputOptions };
-    notFoundUserInputOptions.actionDod.body.id = 67932088504;
+    const notFoundUserActionDod = { ...oneUserFindedActionDod };
+    notFoundUserActionDod.attrs.id = 67932088504;
 
-    const result = await sut.execute(notFoundUserInputOptions);
+    const result = await sut.execute(notFoundUserActionDod);
     expect(result.isFailure()).toBe(true);
     expect(result.value).toEqual({
-      name: 'TelegramUserDoesNotExistError',
       locale: {
         text: 'У вас нет аккаунта.',
         hint: {
           telegramId: 67932088504,
         },
       },
-      errorType: 'domain-error',
-      domainType: 'error',
+      meta: {
+        name: 'TelegramUserDoesNotExistError',
+        errorType: 'domain-error',
+        domainType: 'error',
+      },
     });
 
     expect(findByTelegramIdMock).toHaveBeenCalledTimes(1);
@@ -180,23 +185,23 @@ describe('user authentification use case tests', () => {
   });
 
   test('провал, не прошла валидация', async () => {
-    const notValid: UserAuthentificationInputOptions = {
-      ...oneUserFindedInputOptions,
-      actionDod: {
-        actionName: 'userAuthentification',
-        body: {
-          id: -694528239,
-          auth_date: new Date('2021-01-01').getTime() - 1000,
-          hash: 'f48f14a7c9ceff0b320a7233a6395299e67418cce6b0c04246eb1eecac35f7b6',
-        },
+    const notValid: UserAuthentificationActionDod = {
+      ...oneUserFindedActionDod,
+      attrs: {
+        id: -694528239,
+        auth_date: new Date('2021-01-01').getTime() - 1000,
+        hash: 'f48f14a7c9ceff0b320a7233a6395299e67418cce6b0c04246eb1eecac35f7b6',
       },
     };
+
     const result = await sut.execute(notValid);
     expect(result.isFailure()).toBe(true);
     expect(result.value).toEqual({
-      name: 'Validation error',
-      domainType: 'error',
-      errorType: 'app-error',
+      meta: {
+        name: 'Validation error',
+        domainType: 'error',
+        errorType: 'app-error',
+      },
       errors: {
         userAuthentification: {
           id: [
@@ -212,26 +217,20 @@ describe('user authentification use case tests', () => {
   });
 
   test('провал, запрос досупен только для неавторизованных пользователей', async () => {
-    const notValid: UserAuthentificationInputOptions = {
-      ...oneUserFindedInputOptions,
-      caller: {
-        type: 'DomainUser',
-        userId: 'any user id',
-        requestID: '',
-      },
-    };
-    const result = await sut.execute(notValid);
+    const result = await sut.execute(oneUserFindedActionDod);
     expect(result.isFailure()).toBe(true);
     expect(result.value).toEqual({
-      name: 'Permission denied',
       locale: {
         text: 'Действие не доступно',
         hint: {
           allowedOnlyFor: ['AnonymousUser'],
         },
       },
-      errorType: 'domain-error',
-      domainType: 'error',
+      meta: {
+        name: 'Permission denied',
+        errorType: 'domain-error',
+        domainType: 'error',
+      },
     });
   });
 });

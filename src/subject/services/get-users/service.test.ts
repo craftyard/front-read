@@ -2,30 +2,27 @@
 import {
   describe, test, expect, spyOn,
 } from 'bun:test';
-import { GetUsersInputOptions, GetingUsersOut } from 'cy-domain/src/subject/domain-data/user/get-users/s-params';
+import { GetUsersActionDod, GetingUsersOut } from 'cy-domain/src/subject/domain-data/user/get-users/s-params';
 import { UserAttrs } from 'cy-domain/src/subject/domain-data/user/params';
-import { GettingUserUC } from './use-case';
+import { GettingUserService } from './service';
 import { SubjectUseCaseFixtures as fixtures } from '../fixtures';
 
 describe('тесты для use-case getUsers', () => {
-  const sut = new GettingUserUC();
+  const sut = new GettingUserService();
   const resolver = new fixtures.ResolverMock();
   sut.init(resolver);
 
-  const validInputOptions: GetUsersInputOptions = {
-    actionDod: {
-      actionName: 'getUsers',
-      body: {
-        userIds: [
-          'fa91a299-105b-4fb0-a056-92634249130c',
-          '493f5cbc-f572-4469-9cf1-3702802e6a31',
-        ],
-      },
+  const validActionDod: GetUsersActionDod = {
+    meta: {
+      name: 'getUsers',
+      actionId: 'd98f438a-c697-4da1-8245-fe993cf820c4',
+      domainType: 'action',
     },
-    caller: {
-      type: 'DomainUser',
-      userId: 'd98f438a-c697-4da1-8245-fe993cf820c4',
-      requestID: 'd98f438a-c697-4da1-8245-fe993cf820c4',
+    attrs: {
+      userIds: [
+        'fa91a299-105b-4fb0-a056-92634249130c',
+        '493f5cbc-f572-4469-9cf1-3702802e6a31',
+      ],
     },
   };
 
@@ -56,7 +53,7 @@ describe('тесты для use-case getUsers', () => {
       'getUsers',
     ).mockResolvedValueOnce([...users]);
 
-    const result = await sut.execute(validInputOptions);
+    const result = await sut.execute(validActionDod);
     expect(result.isSuccess()).toBe(true);
     expect(result.value as GetingUsersOut).toEqual(users);
     expect(getUsersMock).toHaveBeenCalledTimes(1);
@@ -68,7 +65,7 @@ describe('тесты для use-case getUsers', () => {
 
   test('провал, не прошла валидация', async () => {
     const notValidInputOpt = {
-      ...validInputOptions,
+      ...validActionDod,
       actionDod: {
         actionName: 'getUsers' as const,
         body: {
@@ -82,9 +79,11 @@ describe('тесты для use-case getUsers', () => {
     const result = await sut.execute(notValidInputOpt);
     expect(result.isFailure()).toBe(true);
     expect(result.value).toEqual({
-      name: 'validation-error',
-      domainType: 'error',
-      errorType: 'app-error',
+      meta: {
+        name: 'Validation error',
+        domainType: 'error',
+        errorType: 'app-error',
+      },
       errors: {
         getUsers: {
           0: {
@@ -103,7 +102,7 @@ describe('тесты для use-case getUsers', () => {
 
   test('провал, запрещен доступ неавторизованному пользователю', async () => {
     const notValidInputOpt = {
-      ...validInputOptions,
+      ...validActionDod,
       caller: {
         type: 'AnonymousUser' as const,
         requestID: 'd98f438a-c697-4da1-8245-fe993cf820c4',
@@ -112,15 +111,17 @@ describe('тесты для use-case getUsers', () => {
     const result = await sut.execute(notValidInputOpt);
     expect(result.isFailure()).toBe(true);
     expect(result.value).toEqual({
-      name: 'Permission denied',
       locale: {
         text: 'Действие не доступно',
         hint: {
           allowedOnlyFor: ['DomainUser'],
         },
       },
-      errorType: 'domain-error',
-      domainType: 'error',
+      meta: {
+        name: 'Permission denied',
+        errorType: 'domain-error',
+        domainType: 'error',
+      },
     });
   });
 });
