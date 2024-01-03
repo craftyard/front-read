@@ -11,13 +11,17 @@ const WORKSHOP_MODULE_ENDPOINT = 'workshop/';
 
   @Controller(WORKSHOP_MODULE_ENDPOINT)
 export class WorkshopController extends ParentController {
-    @Post()
+  // eslint-disable-next-line no-useless-constructor
+  constructor(workshopResolver: WorkshopResolver) {
+    super(workshopResolver);
+  }
+
+  @Post()
   async execute(
       @Body() body: ActionDod,
       @Res({ passthrough: true }) response: Response,
       @Req() req: RequestCY,
-        workshopResolver: WorkshopResolver,
   ): Promise<void> {
-    return this.execute(body, response, req, workshopResolver);
+    return this.executeService(body, req.user, response);
   }
 }
