@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import {
-  describe, test, expect, spyOn, beforeAll, afterAll,
+  describe, test, expect, spyOn, beforeAll, afterAll, afterEach,
 } from 'bun:test';
 import { JWTTokens } from 'rilata/src/app/jwt/types';
 import { TokenCreator } from 'rilata/src/app/jwt/token-creator.interface';
@@ -12,10 +12,11 @@ import { testUsersRecords } from 'cy-domain/src/subject/domain-object/user/json-
 import { TelegramId } from 'cy-domain/src/types';
 import { UserAuthentificationActionDod } from 'cy-domain/src/subject/domain-data/user/user-authentification/s-params';
 import { UserAR } from 'cy-domain/src/subject/domain-object/user/a-root';
+import { storeDispatcher } from 'rilata/src/app/async-store/store-dispatcher';
+import { SubjectUseCaseFixtures as fixtures } from '../fixtures';
 import { UserAuthentificationService } from './service';
-import { SubjectUseCaseFixtures } from '../fixtures';
 
-describe('user authentification use case tests', () => {
+describe('user authentification service tests', () => {
   const getNowOriginal = UserAR.prototype.getNowDate;
   beforeAll(() => {
     UserAR.prototype.getNowDate = () => new Date('2021-01-01');
@@ -24,9 +25,9 @@ describe('user authentification use case tests', () => {
   afterAll(() => {
     UserAR.prototype.getNowDate = getNowOriginal;
   });
-
   const sut = new UserAuthentificationService();
-  const resolver = new SubjectUseCaseFixtures.ResolverMock();
+  const resolver = new fixtures.ResolverMock();
+
   const tokenCreatorMock = {
     createToken(): JWTTokens {
       return {
@@ -53,7 +54,6 @@ describe('user authentification use case tests', () => {
         return new UserAR(userAttrs, userRecord.version, resolver.getLogger());
       }),
   );
-
   sut.init(resolver);
 
   const oneUserFindedAuthQuery: TelegramAuthDTO = {
@@ -75,19 +75,21 @@ describe('user authentification use case tests', () => {
     auth_date: new Date('2021-01-01').getTime() - 1000,
     hash: '94e3af7a0604b8494aa812f17159321958220291916aa78462c7cbc153d14056',
   };
-
+  storeDispatcher.setThreadStore(fixtures.anonymousUserThreadStore);
   test('успех, возвращен сгенерированный токен для одного сотрудника', async () => {
     resolveRealisationMock.mockClear();
     findByTelegramIdMock.mockClear();
-
+    const users: UserAR[] = await findByTelegramIdMock(oneUserFindedAuthQuery.id);
+    findByTelegramIdMock.mockResolvedValueOnce(users);
     const result = await sut.execute(oneUserFindedActionDod);
+    console.log(result.value);
     expect(result.isSuccess()).toBe(true);
     expect(result.value).toEqual({
       accessToken: 'some access token',
       refreshToken: 'some refresh token',
     });
 
-    expect(findByTelegramIdMock).toHaveBeenCalledTimes(1);
+    expect(findByTelegramIdMock).toHaveBeenCalledTimes(2);
     expect(findByTelegramIdMock.mock.calls[0][0]).toBe(3290593910);
 
     expect(resolveRealisationMock).toHaveBeenCalledTimes(2);
@@ -216,7 +218,8 @@ describe('user authentification use case tests', () => {
     });
   });
 
-  test('провал, запрос досупен только для неавторизованных пользователей', async () => {
+  test('провал, запрос доступен только для неавторизованных пользователей', async () => {
+    storeDispatcher.setThreadStore(fixtures.domainUserThreadStore);
     const result = await sut.execute(oneUserFindedActionDod);
     expect(result.isFailure()).toBe(true);
     expect(result.value).toEqual({
