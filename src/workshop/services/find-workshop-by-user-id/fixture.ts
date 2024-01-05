@@ -5,7 +5,7 @@ import { WorkshopAttrs } from 'cy-domain/src/workshop/domain-data/workshop/param
 import { WorkshopReadRepository } from 'cy-domain/src/workshop/domain-object/workshop/repository';
 import { StorePayload, ThreadStore } from 'rilata/src/app/async-store/types';
 import { AnonymousUser, DomainUser } from 'rilata/src/app/caller';
-import { Database } from 'rilata/src/app/database';
+import { Database } from 'rilata/src/app/database/database';
 import { TokenVerifier } from 'rilata/src/app/jwt/token-verifier.interface';
 import { ModuleResolver } from 'rilata/src/app/resolves/module-resolver';
 import { RunMode } from 'rilata/src/app/types';
