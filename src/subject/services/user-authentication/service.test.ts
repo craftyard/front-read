@@ -82,7 +82,6 @@ describe('user authentification service tests', () => {
     const users: UserAR[] = await findByTelegramIdMock(oneUserFindedAuthQuery.id);
     findByTelegramIdMock.mockResolvedValueOnce(users);
     const result = await sut.execute(oneUserFindedActionDod);
-    console.log(result.value);
     expect(result.isSuccess()).toBe(true);
     expect(result.value).toEqual({
       accessToken: 'some access token',
