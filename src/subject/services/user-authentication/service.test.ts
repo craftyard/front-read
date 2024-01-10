@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import {
-  describe, test, expect, spyOn, beforeAll, afterAll, afterEach,
+  describe, test, expect, spyOn, beforeAll, afterAll,
 } from 'bun:test';
 import { JWTTokens } from 'rilata/src/app/jwt/types';
 import { TokenCreator } from 'rilata/src/app/jwt/token-creator.interface';
@@ -76,11 +76,10 @@ describe('user authentification service tests', () => {
     hash: '94e3af7a0604b8494aa812f17159321958220291916aa78462c7cbc153d14056',
   };
   storeDispatcher.setThreadStore(fixtures.anonymousUserThreadStore);
+
   test('успех, возвращен сгенерированный токен для одного сотрудника', async () => {
     resolveRealisationMock.mockClear();
     findByTelegramIdMock.mockClear();
-    const users: UserAR[] = await findByTelegramIdMock(oneUserFindedAuthQuery.id);
-    findByTelegramIdMock.mockResolvedValueOnce(users);
     const result = await sut.execute(oneUserFindedActionDod);
     expect(result.isSuccess()).toBe(true);
     expect(result.value).toEqual({
@@ -88,7 +87,7 @@ describe('user authentification service tests', () => {
       refreshToken: 'some refresh token',
     });
 
-    expect(findByTelegramIdMock).toHaveBeenCalledTimes(2);
+    expect(findByTelegramIdMock).toHaveBeenCalledTimes(1);
     expect(findByTelegramIdMock.mock.calls[0][0]).toBe(3290593910);
 
     expect(resolveRealisationMock).toHaveBeenCalledTimes(2);

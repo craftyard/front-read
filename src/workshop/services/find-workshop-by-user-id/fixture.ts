@@ -12,7 +12,6 @@ import { RunMode } from 'rilata/src/app/types';
 import { UuidType } from 'rilata/src/common/types';
 import { DTO } from 'rilata/src/domain/dto';
 import { Module } from 'rilata/src/app/module/module';
-import { RunMode } from 'rilata/src/app/types';
 
 export class WorkshopRepoMock implements WorkshopReadRepository {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -56,10 +55,6 @@ export class ResolverMock implements ModuleResolver {
   }
 
   getTokenVerifier(): TokenVerifier<DTO> {
-    throw new Error('Method not implemented.');
-  }
-
-  getRunMode(): RunMode {
     throw new Error('Method not implemented.');
   }
 }

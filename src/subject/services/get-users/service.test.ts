@@ -2,7 +2,7 @@
 import {
   describe, test, expect, spyOn, afterEach,
 } from 'bun:test';
-import { GetUsersActionDod, GetingUsersOut } from 'cy-domain/src/subject/domain-data/user/get-users/s-params';
+import { GetingUsersOut } from 'cy-domain/src/subject/domain-data/user/get-users/s-params';
 import { UserAttrs } from 'cy-domain/src/subject/domain-data/user/params';
 import { storeDispatcher } from 'rilata/src/app/async-store/store-dispatcher';
 import { GettingUserService } from './service';
@@ -42,8 +42,8 @@ describe('тесты для use-case getUsers', () => {
 
   test('успех, запрос для пользователя нормально проходит', async () => {
     getUsersMock.mockResolvedValueOnce([...users]);
-    storeDispatcher.setThreadStore(fixtures.domainUserThreadStore);
-    const result = await sut.execute(fixtures.validActionDod);
+    storeDispatcher.setThreadStore({ ...fixtures.domainUserThreadStore });
+    const result = await sut.execute({ ...fixtures.validActionDod });
     expect(result.isSuccess()).toBe(true);
     expect(result.value as GetingUsersOut).toEqual(users);
     expect(getUsersMock).toHaveBeenCalledTimes(1);
@@ -54,8 +54,8 @@ describe('тесты для use-case getUsers', () => {
   });
 
   test('провал, запрещен доступ неавторизованному пользователю', async () => {
-    storeDispatcher.setThreadStore(fixtures.anonymousUserThreadStore);
-    const result = await sut.execute(fixtures.validActionDod);
+    storeDispatcher.setThreadStore({ ...fixtures.anonymousUserThreadStore });
+    const result = await sut.execute({ ...fixtures.validActionDod });
     expect(result.isFailure()).toBe(true);
     expect(result.value).toEqual({
       locale: {
