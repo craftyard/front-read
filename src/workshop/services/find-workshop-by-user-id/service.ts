@@ -1,5 +1,5 @@
 import { QueryService } from 'rilata/src/app/service/query-service';
-import { ActionDodValidator, ServiceResult } from 'rilata/src/app/service/types';
+import { ServiceResult } from 'rilata/src/app/service/types';
 import { GetMyWorkshopActionDod, GetMyWorkshopServiceParams, WorkshopForUserDoesntExistError } from 'cy-domain/src/workshop/domain-data/workshop/get-my-workshop/s-params';
 import { WorkshopReadRepository } from 'cy-domain/src/workshop/domain-object/workshop/repository';
 import { getMyWorkshopValidator } from 'cy-domain/src/workshop/domain-data/workshop/get-my-workshop/s-vmap';
