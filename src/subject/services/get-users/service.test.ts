@@ -79,8 +79,8 @@ describe('тесты для use-case getUsers', () => {
     const result = await sut.execute(notValidInputOpt);
     expect(result.isFailure()).toBe(true);
     expect(result.value).toEqual({
+      name: 'Validation error',
       meta: {
-        name: 'Validation error',
         domainType: 'error',
         errorType: 'app-error',
       },
@@ -117,8 +117,8 @@ describe('тесты для use-case getUsers', () => {
           allowedOnlyFor: ['DomainUser'],
         },
       },
+      name: 'Permission denied',
       meta: {
-        name: 'Permission denied',
         errorType: 'domain-error',
         domainType: 'error',
       },

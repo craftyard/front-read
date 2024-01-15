@@ -46,8 +46,8 @@ describe('Тесты для use-case getMyWorkshop', () => {
         text: 'Мастерская не найдена',
         hint: {},
       },
+      name: 'WorkshopForUserDoesntExistError',
       meta: {
-        name: 'WorkshopForUserDoesntExistError',
         domainType: 'error',
         errorType: 'domain-error',
       },
@@ -67,8 +67,8 @@ describe('Тесты для use-case getMyWorkshop', () => {
           allowedOnlyFor: ['DomainUser'],
         },
       },
+      name: 'Permission denied',
       meta: {
-        name: 'Permission denied',
         errorType: 'domain-error',
         domainType: 'error',
       },
