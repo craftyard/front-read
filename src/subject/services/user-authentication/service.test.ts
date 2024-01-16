@@ -13,7 +13,7 @@ import { TelegramId } from 'cy-domain/src/types';
 import { UserAuthentificationActionDod } from 'cy-domain/src/subject/domain-data/user/user-authentification/s-params';
 import { UserAR } from 'cy-domain/src/subject/domain-object/user/a-root';
 import { storeDispatcher } from 'rilata/src/app/async-store/store-dispatcher';
-import { SubjectUseCaseFixtures as fixtures } from '../fixtures';
+import { SubjectServiceFixtures as fixtures } from '../fixtures';
 import { UserAuthentificationService } from './service';
 
 describe('user authentification service tests', () => {
@@ -123,8 +123,8 @@ describe('user authentification service tests', () => {
           telegramId: 5436134100,
         },
       },
+      name: 'ManyAccountNotSupportedError',
       meta: {
-        name: 'ManyAccountNotSupportedError',
         errorType: 'domain-error',
         domainType: 'error',
       },
@@ -148,8 +148,8 @@ describe('user authentification service tests', () => {
           telegramId: 5436134100,
         },
       },
+      name: 'ManyAccountNotSupportedError',
       meta: {
-        name: 'ManyAccountNotSupportedError',
         errorType: 'domain-error',
         domainType: 'error',
       },
@@ -173,8 +173,8 @@ describe('user authentification service tests', () => {
           telegramId: 67932088504,
         },
       },
+      name: 'TelegramUserDoesNotExistError',
       meta: {
-        name: 'TelegramUserDoesNotExistError',
         errorType: 'domain-error',
         domainType: 'error',
       },
@@ -197,8 +197,8 @@ describe('user authentification service tests', () => {
     const result = await sut.execute(notValid);
     expect(result.isFailure()).toBe(true);
     expect(result.value).toEqual({
+      name: 'Validation error',
       meta: {
-        name: 'Validation error',
         domainType: 'error',
         errorType: 'app-error',
       },
@@ -206,9 +206,9 @@ describe('user authentification service tests', () => {
         userAuthentification: {
           id: [
             {
+              name: 'PositiveNumberValidationRule',
               text: 'Число должно быть положительным',
               hint: {},
-              name: 'PositiveNumberValidationRule',
             },
           ],
         },
@@ -227,8 +227,8 @@ describe('user authentification service tests', () => {
           allowedOnlyFor: ['AnonymousUser'],
         },
       },
+      name: 'Permission denied',
       meta: {
-        name: 'Permission denied',
         errorType: 'domain-error',
         domainType: 'error',
       },

@@ -6,19 +6,15 @@ import { GetingUsersOut } from 'cy-domain/src/subject/domain-data/user/get-users
 import { UserAttrs } from 'cy-domain/src/subject/domain-data/user/params';
 import { storeDispatcher } from 'rilata/src/app/async-store/store-dispatcher';
 import { GettingUserService } from './service';
-import { SubjectUseCaseFixtures as fixtures } from '../fixtures';
+import { SubjectServiceFixtures as fixtures } from '../fixtures';
 
 describe('тесты для use-case getUsers', () => {
   const sut = new GettingUserService();
-  const resolver = new fixtures.ResolverMock();
-  sut.init(resolver);
-  const getUsersMock = spyOn(
-    resolver.getRepository('repoKey'),
-    'getUsers',
-  );
+  sut.init(fixtures.resolver);
   afterEach(() => {
-    getUsersMock.mockClear();
+    fixtures.resolverGetRepoMock.mockClear();
   });
+
   const users: UserAttrs[] = [
     {
       userId: 'fa91a299-105b-4fb0-a056-92634249130c',
@@ -41,7 +37,8 @@ describe('тесты для use-case getUsers', () => {
   ];
 
   test('успех, запрос для пользователя нормально проходит', async () => {
-    getUsersMock.mockResolvedValueOnce([...users]);
+    const userRepo = fixtures.resolverGetRepoMock();
+    const getUsersMock = spyOn(userRepo, 'getUsers').mockResolvedValueOnce([...users]);
     storeDispatcher.setThreadStore({ ...fixtures.domainUserThreadStore });
     const result = await sut.execute({ ...fixtures.validActionDod });
     expect(result.isSuccess()).toBe(true);
@@ -64,12 +61,12 @@ describe('тесты для use-case getUsers', () => {
           allowedOnlyFor: ['DomainUser'],
         },
       },
+      name: 'Permission denied',
       meta: {
-        name: 'Permission denied',
         errorType: 'domain-error',
         domainType: 'error',
       },
     });
-    expect(getUsersMock).toHaveBeenCalledTimes(0);
+    expect(fixtures.resolverGetRepoMock).toHaveBeenCalledTimes(0);
   });
 });

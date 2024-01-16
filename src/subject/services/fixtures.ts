@@ -1,22 +1,17 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { ConsoleLogger } from 'rilata/src/common/logger/console-logger';
-import { Logger } from 'rilata/src/common/logger/logger';
 import { UserCmdRepository } from 'cy-domain/src/subject/domain-object/user/cmd-repository';
 import { UserReadRepository } from 'cy-domain/src/subject/domain-object/user/read-repository';
 import { UserAttrs } from 'cy-domain/src/subject/domain-data/user/params';
 import { ModuleResolver } from 'rilata/src/app/resolves/module-resolver';
 import { UserAR } from 'cy-domain/src/subject/domain-object/user/a-root';
-import { Database } from 'rilata/src/app/database/database';
-import { TokenVerifier } from 'rilata/src/app/jwt/token-verifier.interface';
-import { Module } from 'rilata/src/app/module/module';
-import { RunMode } from 'rilata/src/app/types';
-import { DTO } from 'rilata/src/domain/dto';
 import { UuidType } from 'rilata/src/common/types';
 import { StorePayload, ThreadStore } from 'rilata/src/app/async-store/types';
 import { AnonymousUser, DomainUser } from 'rilata/src/app/caller';
 import { GetUsersActionDod } from 'cy-domain/src/subject/domain-data/user/get-users/s-params';
+import { TestResolverMock } from 'rilata/src/app/resolves/test-resolver-mock';
+import { Mock, spyOn } from 'bun:test';
 
-export namespace SubjectUseCaseFixtures {
+export namespace SubjectServiceFixtures {
   export class UserRepoMock implements UserCmdRepository, UserReadRepository {
     findByTelegramId(telegramId: number): Promise<UserAR[]> {
       throw new Error('Method not implemented.');
@@ -27,41 +22,12 @@ export namespace SubjectUseCaseFixtures {
     }
   }
 
-  export class ResolverMock implements ModuleResolver {
-    private repoMock = new UserRepoMock();
+  export const resolver: ModuleResolver = new TestResolverMock();
 
-    init(module: Module): void {
-      throw new Error('Method not implemented.');
-    }
-
-    getTokenVerifier(): TokenVerifier<DTO> {
-      throw new Error('Method not implemented.');
-    }
-
-    getRunMode(): RunMode {
-      throw new Error('Method not implemented.');
-    }
-
-    getModule(): Module {
-      throw new Error('Method not implemented.');
-    }
-
-    getDatabase(): Database {
-      throw new Error('Method not implemented.');
-    }
-
-    getLogger(): Logger {
-      return new ConsoleLogger();
-    }
-
-    getRepository(repoKey: unknown): UserRepoMock {
-      return this.repoMock;
-    }
-
-    getRealisation(...args: unknown[]): unknown {
-      throw new Error('Method not implemented.');
-    }
-  }
+  export const resolverGetRepoMock = spyOn(
+    resolver,
+    'getRepository',
+  ).mockReturnValue(new UserRepoMock()) as Mock<(...args: unknown[]) => UserRepoMock>;
 
   export const validActionDod: GetUsersActionDod = {
     meta: {
@@ -82,13 +48,11 @@ export namespace SubjectUseCaseFixtures {
     userId: 'fb8a83cf-25a3-2b4f-86e1-27f6de6d8374',
   };
 
-  const moduleResolver: ModuleResolver = new ResolverMock();
-
   const actionId: UuidType = 'pb8a83cf-25a3-2b4f-86e1-2744de6d8374';
 
   const domainUserStorePayload: StorePayload = {
     caller: domainUser,
-    moduleResolver,
+    moduleResolver: resolver,
     actionId,
   };
 
@@ -105,7 +69,7 @@ export namespace SubjectUseCaseFixtures {
 
   const anonymousUserStorePayload: StorePayload = {
     caller: anonymousUser,
-    moduleResolver,
+    moduleResolver: resolver,
     actionId,
   };
 
