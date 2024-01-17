@@ -25,8 +25,9 @@ describe('user authentification service tests', () => {
   afterAll(() => {
     UserAR.prototype.getNowDate = getNowOriginal;
   });
+
+  const userRepoMock = new fixtures.UserRepoMock();
   const sut = new UserAuthentificationService();
-  const resolver = new fixtures.ResolverMock();
 
   const tokenCreatorMock = {
     createToken(): JWTTokens {
@@ -37,28 +38,29 @@ describe('user authentification service tests', () => {
     },
   };
 
-  const resolveRealisationMock = spyOn(resolver, 'getRealisation').mockImplementation((key: unknown) => {
+  const resolveRealisationMock = spyOn(fixtures.resolver, 'getRealisation').mockImplementation((key: unknown) => {
     if (key === 'botToken') return 'some bot token';
     if (key === TokenCreator) return tokenCreatorMock;
     throw Error('not valid key');
   });
 
+  const getRepositoryMock = spyOn(fixtures.resolver, 'getRepository').mockReturnValueOnce(userRepoMock);
   const findByTelegramIdMock = spyOn(
-    resolver.getRepository(UserCmdRepository),
+    userRepoMock,
     'findByTelegramId',
   ).mockImplementation(
     async (telegramId: TelegramId) => testUsersRecords
       .filter((userRecord) => userRecord.telegramId === telegramId)
       .map((userRecord) => {
         const userAttrs = dtoUtility.excludeAttrs(userRecord, 'version');
-        return new UserAR(userAttrs, userRecord.version, resolver.getLogger());
+        return new UserAR(userAttrs, userRecord.version, fixtures.resolver.getLogger());
       }),
   );
-  sut.init(resolver);
+  sut.init(fixtures.resolver);
 
   const oneUserFindedAuthQuery: TelegramAuthDTO = {
     id: 3290593910,
-    auth_date: new Date('2021-01-01').getTime() - 1000,
+    auth_date: (new Date('2021-01-01').getTime() - 1000) / 1000,
     hash: '69d4ebba0b28a1b88634ef973918deffcf75d08d87f683677efb18baebc73c4d',
   };
   const oneUserFindedActionDod: UserAuthentificationActionDod = {
@@ -72,7 +74,7 @@ describe('user authentification service tests', () => {
 
   const manyUserFindedAuthQuery: TelegramAuthDTO = {
     id: 5436134100,
-    auth_date: new Date('2021-01-01').getTime() - 1000,
+    auth_date: (new Date('2021-01-01').getTime() - 1000) / 1000,
     hash: '94e3af7a0604b8494aa812f17159321958220291916aa78462c7cbc153d14056',
   };
   storeDispatcher.setThreadStore(fixtures.anonymousUserThreadStore);
@@ -97,16 +99,16 @@ describe('user authentification service tests', () => {
 
   test('провал, случаи когда один сотрудник и один клиент', async () => {
     const findByTelegramIdTwoUserMock = spyOn(
-      resolver.getRepository(UserCmdRepository),
+      userRepoMock,
       'findByTelegramId',
-    ).mockImplementationOnce(
+    ).mockImplementation(
       async (telegramId: TelegramId) => {
         const shiftedUserRecords = dtoUtility.deepCopy(testUsersRecords).slice(1);
         return shiftedUserRecords
           .filter((userRecord) => userRecord.telegramId === telegramId)
           .map((userRecord) => {
             const userAttrs = dtoUtility.excludeAttrs(userRecord, 'version');
-            return new UserAR(userAttrs, userRecord.version, resolver.getLogger());
+            return new UserAR(userAttrs, userRecord.version, fixtures.resolver.getLogger());
           });
       },
     );

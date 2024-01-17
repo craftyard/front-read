@@ -8,7 +8,7 @@ import { UuidType } from 'rilata/src/common/types';
 import { StorePayload, ThreadStore } from 'rilata/src/app/async-store/types';
 import { AnonymousUser, DomainUser } from 'rilata/src/app/caller';
 import { GetUsersActionDod } from 'cy-domain/src/subject/domain-data/user/get-users/s-params';
-import { TestResolverMock } from 'rilata/src/app/resolves/test-resolver-mock';
+import { TestResolverMock } from 'rilata/tests/fixtures/test-resolver-mock';
 import { Mock, spyOn } from 'bun:test';
 
 export namespace SubjectServiceFixtures {
