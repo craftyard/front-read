@@ -20,6 +20,10 @@ export namespace SubjectServiceFixtures {
     getUsers(userIds: string[]): Promise<UserAttrs[]> {
       throw new Error('Method not implemented.');
     }
+
+    getUser(userId: string): Promise<UserAttrs> {
+      throw new Error('Method not implemented.');
+    }
   }
 
   export const resolver: ModuleResolver = new TestResolverMock();

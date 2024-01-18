@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import {
-  describe, test, expect, spyOn, beforeAll, afterAll,
+  describe, test, expect, spyOn, beforeAll, afterAll, afterEach,
 } from 'bun:test';
 import { JWTTokens } from 'rilata/src/app/jwt/types';
 import { TokenCreator } from 'rilata/src/app/jwt/token-creator.interface';
@@ -18,16 +18,9 @@ import { UserAuthentificationService } from './service';
 
 describe('user authentification service tests', () => {
   const getNowOriginal = UserAR.prototype.getNowDate;
-  beforeAll(() => {
-    UserAR.prototype.getNowDate = () => new Date('2021-01-01');
-  });
-
-  afterAll(() => {
-    UserAR.prototype.getNowDate = getNowOriginal;
-  });
-
   const userRepoMock = new fixtures.UserRepoMock();
   const sut = new UserAuthentificationService();
+  sut.init(fixtures.resolver);
 
   const tokenCreatorMock = {
     createToken(): JWTTokens {
@@ -44,7 +37,7 @@ describe('user authentification service tests', () => {
     throw Error('not valid key');
   });
 
-  const getRepositoryMock = spyOn(fixtures.resolver, 'getRepository').mockReturnValueOnce(userRepoMock);
+  const getRepositoryMock = spyOn(fixtures.resolver, 'getRepository').mockReturnValue(userRepoMock);
   const findByTelegramIdMock = spyOn(
     userRepoMock,
     'findByTelegramId',
@@ -56,12 +49,11 @@ describe('user authentification service tests', () => {
         return new UserAR(userAttrs, userRecord.version, fixtures.resolver.getLogger());
       }),
   );
-  sut.init(fixtures.resolver);
 
   const oneUserFindedAuthQuery: TelegramAuthDTO = {
     id: 3290593910,
-    auth_date: (new Date('2021-01-01').getTime() - 1000) / 1000,
-    hash: '69d4ebba0b28a1b88634ef973918deffcf75d08d87f683677efb18baebc73c4d',
+    auth_date: (new Date('2021-01-01').getTime() / 1000 - 1),
+    hash: '3cd978e315b22de63b9544fd568eedbcedbe842023458666fa4c2817aaa12371',
   };
   const oneUserFindedActionDod: UserAuthentificationActionDod = {
     meta: {
@@ -74,10 +66,21 @@ describe('user authentification service tests', () => {
 
   const manyUserFindedAuthQuery: TelegramAuthDTO = {
     id: 5436134100,
-    auth_date: (new Date('2021-01-01').getTime() - 1000) / 1000,
+    auth_date: (new Date('2021-01-01').getTime() / 1000 - 1),
     hash: '94e3af7a0604b8494aa812f17159321958220291916aa78462c7cbc153d14056',
   };
   storeDispatcher.setThreadStore(fixtures.anonymousUserThreadStore);
+
+  beforeAll(() => {
+    UserAR.prototype.getNowDate = () => new Date('2021-01-01');
+  });
+
+  afterAll(() => {
+    UserAR.prototype.getNowDate = getNowOriginal;
+  });
+  afterEach(()=>{
+    getRepositoryMock.mockClear();
+  })
 
   test('успех, возвращен сгенерированный токен для одного сотрудника', async () => {
     resolveRealisationMock.mockClear();
@@ -91,6 +94,8 @@ describe('user authentification service tests', () => {
 
     expect(findByTelegramIdMock).toHaveBeenCalledTimes(1);
     expect(findByTelegramIdMock.mock.calls[0][0]).toBe(3290593910);
+
+    expect(getRepositoryMock).toHaveBeenCalledTimes(1);
 
     expect(resolveRealisationMock).toHaveBeenCalledTimes(2);
     expect(resolveRealisationMock.mock.calls[0][0]).toBe('botToken');
@@ -131,7 +136,7 @@ describe('user authentification service tests', () => {
         domainType: 'error',
       },
     });
-
+    expect(getRepositoryMock).toHaveBeenCalledTimes(1);
     expect(findByTelegramIdTwoUserMock).toHaveBeenCalledTimes(1);
     expect(findByTelegramIdTwoUserMock.mock.calls[0][0]).toBe(5436134100);
   });
@@ -156,7 +161,7 @@ describe('user authentification service tests', () => {
         domainType: 'error',
       },
     });
-
+    expect(getRepositoryMock).toHaveBeenCalledTimes(1);
     expect(findByTelegramIdMock).toHaveBeenCalledTimes(1);
     expect(findByTelegramIdMock.mock.calls[0][0]).toBe(5436134100);
   });
@@ -165,7 +170,6 @@ describe('user authentification service tests', () => {
     findByTelegramIdMock.mockClear();
     const notFoundUserActionDod = { ...oneUserFindedActionDod };
     notFoundUserActionDod.attrs.id = 67932088504;
-
     const result = await sut.execute(notFoundUserActionDod);
     expect(result.isFailure()).toBe(true);
     expect(result.value).toEqual({
@@ -181,7 +185,7 @@ describe('user authentification service tests', () => {
         domainType: 'error',
       },
     });
-
+    expect(getRepositoryMock).toHaveBeenCalledTimes(1);
     expect(findByTelegramIdMock).toHaveBeenCalledTimes(1);
     expect(findByTelegramIdMock.mock.calls[0][0]).toBe(67932088504);
   });
