@@ -105,5 +105,10 @@ describe('тесты для use-case getUsers', () => {
         },
       },
     });
+    expect(getUsersMock).toHaveBeenCalledTimes(1);
+    expect(getUsersMock.mock.calls[0][0]).toEqual([
+      'fa91a299-105b-4fb0-a056-92634249130c',
+      '493f5cbc-f572-4469-9cf1-3702802e6a31',
+    ]);
   });
 });
