@@ -5,6 +5,7 @@ import {
 import { GetingUsersOut } from 'cy-domain/src/subject/domain-data/user/get-users/s-params';
 import { UserAttrs } from 'cy-domain/src/subject/domain-data/user/params';
 import { storeDispatcher } from 'rilata/src/app/async-store/store-dispatcher';
+import { getTestStoreDispatcher } from 'rilata/tests/fixtures/test-thread-store-mock';
 import { GettingUserService } from './service';
 import { SubjectServiceFixtures as fixtures } from '../fixtures';
 
@@ -39,7 +40,7 @@ describe('тесты для use-case getUsers', () => {
   test('успех, запрос для пользователя нормально проходит', async () => {
     const userRepo = fixtures.resolverGetRepoMock();
     const getUsersMock = spyOn(userRepo, 'getUsers').mockResolvedValueOnce([...users]);
-    storeDispatcher.setThreadStore({ ...fixtures.domainUserThreadStore });
+    getTestStoreDispatcher('pb8a83cf-25a3-2b4f-86e1-2744de6d8374');
     const result = await sut.execute({ ...fixtures.validActionDod });
     expect(result.isSuccess()).toBe(true);
     expect(result.value as GetingUsersOut).toEqual(users);
@@ -51,7 +52,9 @@ describe('тесты для use-case getUsers', () => {
   });
 
   test('провал, запрещен доступ неавторизованному пользователю', async () => {
-    storeDispatcher.setThreadStore({ ...fixtures.anonymousUserThreadStore });
+    getTestStoreDispatcher('pb8a83cf-25a3-2b4f-86e1-2744de6d8374', {
+      type: 'AnonymousUser',
+    });
     const result = await sut.execute({ ...fixtures.validActionDod });
     expect(result.isFailure()).toBe(true);
     expect(result.value).toEqual({
@@ -73,7 +76,7 @@ describe('тесты для use-case getUsers', () => {
   test('провал, не прошла валидация', async () => {
     const userRepo = fixtures.resolverGetRepoMock();
     const getUsersMock = spyOn(userRepo, 'getUsers').mockResolvedValueOnce([...users]);
-    storeDispatcher.setThreadStore({ ...fixtures.domainUserThreadStore });
+    getTestStoreDispatcher('pb8a83cf-25a3-2b4f-86e1-2744de6d8374');
     const notValidInputOpt = {
       ...fixtures.validActionDod,
       attrs: {

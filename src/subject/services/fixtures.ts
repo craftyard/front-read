@@ -50,39 +50,4 @@ export namespace SubjectServiceFixtures {
       ],
     },
   };
-
-  const domainUser: DomainUser = {
-    type: 'DomainUser',
-    userId: 'fb8a83cf-25a3-2b4f-86e1-27f6de6d8374',
-  };
-
-  const domainUserStorePayload: StorePayload = {
-    caller: domainUser,
-    moduleResolver: resolver,
-    actionId,
-  };
-
-  export const domainUserThreadStore: ThreadStore<StorePayload> = {
-    run: () => {
-      throw new Error('Method not implemented.');
-    },
-    getStore: () => domainUserStorePayload,
-  };
-
-  const anonymousUser:AnonymousUser = {
-    type: 'AnonymousUser',
-  };
-
-  const anonymousUserStorePayload: StorePayload = {
-    caller: anonymousUser,
-    moduleResolver: resolver,
-    actionId,
-  };
-
-  export const anonymousUserThreadStore: ThreadStore<StorePayload> = {
-    run: () => {
-      throw new Error('Method not implemented.');
-    },
-    getStore: () => anonymousUserStorePayload,
-  };
 }

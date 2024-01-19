@@ -7,12 +7,11 @@ import { TokenCreator } from 'rilata/src/app/jwt/token-creator.interface';
 import { uuidUtility } from 'rilata/src/common/utils/uuid/uuid-utility';
 import { dtoUtility } from 'rilata/src/common/utils/dto/dto-utility';
 import { TelegramAuthDTO } from 'cy-domain/src/subject/domain-data/user/user-authentification/a-params';
-import { UserCmdRepository } from 'cy-domain/src/subject/domain-object/user/cmd-repository';
 import { testUsersRecords } from 'cy-domain/src/subject/domain-object/user/json-impl/fixture';
 import { TelegramId } from 'cy-domain/src/types';
 import { UserAuthentificationActionDod } from 'cy-domain/src/subject/domain-data/user/user-authentification/s-params';
 import { UserAR } from 'cy-domain/src/subject/domain-object/user/a-root';
-import { storeDispatcher } from 'rilata/src/app/async-store/store-dispatcher';
+import { getTestStoreDispatcher } from 'rilata/tests/fixtures/test-thread-store-mock';
 import { SubjectServiceFixtures as fixtures } from '../fixtures';
 import { UserAuthentificationService } from './service';
 
@@ -69,7 +68,9 @@ describe('user authentification service tests', () => {
     auth_date: (new Date('2021-01-01').getTime() / 1000 - 1),
     hash: '94e3af7a0604b8494aa812f17159321958220291916aa78462c7cbc153d14056',
   };
-  storeDispatcher.setThreadStore(fixtures.anonymousUserThreadStore);
+  getTestStoreDispatcher('pb8a83cf-25a3-2b4f-86e1-2744de6d8374', {
+    type: 'AnonymousUser',
+  });
 
   beforeAll(() => {
     UserAR.prototype.getNowDate = () => new Date('2021-01-01');
@@ -221,7 +222,7 @@ describe('user authentification service tests', () => {
   });
 
   test('провал, запрос доступен только для неавторизованных пользователей', async () => {
-    storeDispatcher.setThreadStore(fixtures.domainUserThreadStore);
+    getTestStoreDispatcher('pb8a83cf-25a3-2b4f-86e1-2744de6d8374');
     const result = await sut.execute(oneUserFindedActionDod);
     expect(result.isFailure()).toBe(true);
     expect(result.value).toEqual({
