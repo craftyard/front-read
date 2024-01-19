@@ -1,27 +1,25 @@
 import {
   describe, test, expect, spyOn, afterEach,
 } from 'bun:test';
-import { storeDispatcher } from 'rilata/src/app/async-store/store-dispatcher';
 import { dtoUtility } from 'rilata/src/common/utils/dto/dto-utility';
+import { getTestStoreDispatcher } from 'rilata/tests/fixtures/test-thread-store-mock';
 import { FindWorkshopByUserIdService } from './service';
 import {
-  ResolverMock, workshop, domainUserThreadStore, inputOptions, anonymousUserThreadStore,
+  resolver, workshop, inputOptions,
+  resolverGetRepoMock,
 } from './fixture';
 
 describe('Тесты для use-case getMyWorkshop', () => {
   const sut = new FindWorkshopByUserIdService();
-  const resolver = new ResolverMock();
   sut.init(resolver);
-  const getWorkshopMock = spyOn(
-    resolver.getRepository('repoKey'),
-    'findWorkshopByUserId',
-  );
+  const workshopRepo = resolverGetRepoMock();
+  const getWorkshopMock = spyOn(workshopRepo, 'findWorkshopByUserId');
   afterEach(() => {
     getWorkshopMock.mockClear();
   });
   test('успех, запрос для получения workshop-а успешно проходит', async () => {
     getWorkshopMock.mockResolvedValueOnce(dtoUtility.deepCopy(workshop));
-    storeDispatcher.setThreadStore(domainUserThreadStore);
+    getTestStoreDispatcher('pb8a83cf-25a3-2b4f-86e1-2744de6d8374');
     const result = await sut.execute(inputOptions);
     expect(result.isSuccess()).toBe(true);
     expect(result.value).toEqual({
@@ -38,7 +36,7 @@ describe('Тесты для use-case getMyWorkshop', () => {
 
   test('провал, для текущего пользователя мастерская не найдена', async () => {
     getWorkshopMock.mockResolvedValueOnce(undefined);
-    storeDispatcher.setThreadStore(domainUserThreadStore);
+    getTestStoreDispatcher('pb8a83cf-25a3-2b4f-86e1-2744de6d8374');
     const result = await sut.execute(inputOptions);
     expect(result.isFailure()).toBe(true);
     expect(result.value).toEqual({
@@ -46,8 +44,8 @@ describe('Тесты для use-case getMyWorkshop', () => {
         text: 'Мастерская не найдена',
         hint: {},
       },
+      name: 'WorkshopForUserDoesntExistError',
       meta: {
-        name: 'WorkshopForUserDoesntExistError',
         domainType: 'error',
         errorType: 'domain-error',
       },
@@ -57,7 +55,9 @@ describe('Тесты для use-case getMyWorkshop', () => {
   });
 
   test('провал, запрещен доступ неавторизованному пользователю', async () => {
-    storeDispatcher.setThreadStore(anonymousUserThreadStore);
+    getTestStoreDispatcher('pb8a83cf-25a3-2b4f-86e1-2744de6d8374', {
+      type: 'AnonymousUser',
+    });
     const result = await sut.execute(inputOptions);
     expect(result.isFailure()).toBe(true);
     expect(result.value).toEqual({
@@ -67,8 +67,8 @@ describe('Тесты для use-case getMyWorkshop', () => {
           allowedOnlyFor: ['DomainUser'],
         },
       },
+      name: 'Permission denied',
       meta: {
-        name: 'Permission denied',
         errorType: 'domain-error',
         domainType: 'error',
       },

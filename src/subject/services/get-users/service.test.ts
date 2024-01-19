@@ -4,7 +4,6 @@ import {
 } from 'bun:test';
 import { GetingUsersOut } from 'cy-domain/src/subject/domain-data/user/get-users/s-params';
 import { UserAttrs } from 'cy-domain/src/subject/domain-data/user/params';
-import { storeDispatcher } from 'rilata/src/app/async-store/store-dispatcher';
 import { getTestStoreDispatcher } from 'rilata/tests/fixtures/test-thread-store-mock';
 import { GettingUserService } from './service';
 import { SubjectServiceFixtures as fixtures } from '../fixtures';

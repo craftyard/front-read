@@ -1,12 +1,9 @@
 import { GetMyWorkshopActionDod } from 'cy-domain/src/workshop/domain-data/workshop/get-my-workshop/s-params';
 import { WorkshopAttrs } from 'cy-domain/src/workshop/domain-data/workshop/params';
 import { WorkshopReadRepository } from 'cy-domain/src/workshop/domain-object/workshop/repository';
-import { StorePayload, ThreadStore } from 'rilata/src/app/async-store/types';
-import { AnonymousUser, DomainUser } from 'rilata/src/app/caller';
 import { ModuleResolver } from 'rilata/src/app/resolves/module-resolver';
-import { UuidType } from 'rilata/src/common/types';
-import { TestResolverMock } from 'rilata/src/app/resolves/test-resolver-mock';
-import { spyOn } from 'bun:test';
+import { TestResolverMock } from 'rilata/tests/fixtures/test-resolver-mock';
+import { Mock, spyOn } from 'bun:test';
 
 export class WorkshopRepoMock implements WorkshopReadRepository {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -15,46 +12,13 @@ export class WorkshopRepoMock implements WorkshopReadRepository {
   }
 }
 
-const moduleResolver: ModuleResolver = new TestResolverMock();
+export const resolver: ModuleResolver = new TestResolverMock();
 
-export const workshopRepoMock = spyOn(moduleResolver, 'getRepository').mockReturnValueOnce(new WorkshopRepoMock());
+export const resolverGetRepoMock = spyOn(
+  resolver,
+  'getRepository',
+).mockReturnValue(new WorkshopRepoMock()) as Mock<(...args: unknown[]) => WorkshopRepoMock>;
 
-const domainUser: DomainUser = {
-  type: 'DomainUser',
-  userId: 'fb8a83cf-25a3-2b4f-86e1-27f6de6d8374',
-};
-
-const actionId: UuidType = 'pb8a83cf-25a3-2b4f-86e1-2744de6d8374';
-
-const domainUserStorePayload: StorePayload = {
-  caller: domainUser,
-  moduleResolver,
-  actionId,
-};
-
-export const domainUserThreadStore: ThreadStore<StorePayload> = {
-  run: () => {
-    throw new Error('Method not implemented.');
-  },
-  getStore: () => domainUserStorePayload,
-};
-
-const anonymousUser:AnonymousUser = {
-  type: 'AnonymousUser',
-};
-
-const anonymousUserStorePayload: StorePayload = {
-  caller: anonymousUser,
-  moduleResolver,
-  actionId,
-};
-
-export const anonymousUserThreadStore: ThreadStore<StorePayload> = {
-  run: () => {
-    throw new Error('Method not implemented.');
-  },
-  getStore: () => anonymousUserStorePayload,
-};
 export const inputOptions : GetMyWorkshopActionDod = {
   attrs: {
   },
