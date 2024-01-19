@@ -10,6 +10,8 @@ import { AnonymousUser, DomainUser } from 'rilata/src/app/caller';
 import { GetUsersActionDod } from 'cy-domain/src/subject/domain-data/user/get-users/s-params';
 import { TestResolverMock } from 'rilata/tests/fixtures/test-resolver-mock';
 import { Mock, spyOn } from 'bun:test';
+import { UserDoesNotExistError } from 'cy-domain/src/subject/domain-data/user/get-user/s-params';
+import { Result } from 'rilata/src/common/result/types';
 
 export namespace SubjectServiceFixtures {
   export class UserRepoMock implements UserCmdRepository, UserReadRepository {
@@ -21,7 +23,7 @@ export namespace SubjectServiceFixtures {
       throw new Error('Method not implemented.');
     }
 
-    getUser(userId: string): Promise<UserAttrs> {
+    getUser(userId: string): Promise<Result<UserDoesNotExistError, UserAttrs>> {
       throw new Error('Method not implemented.');
     }
   }
@@ -33,10 +35,12 @@ export namespace SubjectServiceFixtures {
     'getRepository',
   ).mockReturnValue(new UserRepoMock()) as Mock<(...args: unknown[]) => UserRepoMock>;
 
+  const actionId: UuidType = 'pb8a83cf-25a3-2b4f-86e1-2744de6d8374';
+
   export const validActionDod: GetUsersActionDod = {
     meta: {
       name: 'getUsers',
-      actionId: 'd98f438a-c697-4da1-8245-fe993cf820c4',
+      actionId,
       domainType: 'action',
     },
     attrs: {
@@ -51,8 +55,6 @@ export namespace SubjectServiceFixtures {
     type: 'DomainUser',
     userId: 'fb8a83cf-25a3-2b4f-86e1-27f6de6d8374',
   };
-
-  const actionId: UuidType = 'pb8a83cf-25a3-2b4f-86e1-2744de6d8374';
 
   const domainUserStorePayload: StorePayload = {
     caller: domainUser,

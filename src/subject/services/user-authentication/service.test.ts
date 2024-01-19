@@ -78,13 +78,13 @@ describe('user authentification service tests', () => {
   afterAll(() => {
     UserAR.prototype.getNowDate = getNowOriginal;
   });
-  afterEach(()=>{
+  afterEach(() => {
+    resolveRealisationMock.mockClear();
     getRepositoryMock.mockClear();
-  })
+    findByTelegramIdMock.mockClear();
+  });
 
   test('успех, возвращен сгенерированный токен для одного сотрудника', async () => {
-    resolveRealisationMock.mockClear();
-    findByTelegramIdMock.mockClear();
     const result = await sut.execute(oneUserFindedActionDod);
     expect(result.isSuccess()).toBe(true);
     expect(result.value).toEqual({
@@ -142,7 +142,6 @@ describe('user authentification service tests', () => {
   });
 
   test('провал, два сотрудника и один клиент, функционал еще не реализован', async () => {
-    findByTelegramIdMock.mockClear();
     const manyUserFindedActionDod = { ...oneUserFindedActionDod };
     manyUserFindedActionDod.attrs = manyUserFindedAuthQuery;
 
@@ -167,7 +166,6 @@ describe('user authentification service tests', () => {
   });
 
   test('провал, случай когда пользователь не найден', async () => {
-    findByTelegramIdMock.mockClear();
     const notFoundUserActionDod = { ...oneUserFindedActionDod };
     notFoundUserActionDod.attrs.id = 67932088504;
     const result = await sut.execute(notFoundUserActionDod);
