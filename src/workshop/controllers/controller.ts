@@ -6,10 +6,9 @@ import { ActionDod } from 'rilata/src/domain/domain-data/domain-types';
 import { Controller as ParentController } from 'rilata/src/app/controller/controller';
 import { RequestCY } from 'backend-core/src/app/jwt/types';
 import { WorkshopResolver } from 'cy-domain/src/workshop/resolver';
+import { WORKSHOP_MODULE_URL } from 'cy-domain/src/workshop/workshop-config';
 
-const WORKSHOP_MODULE_ENDPOINT = 'workshop/';
-
-  @Controller(WORKSHOP_MODULE_ENDPOINT)
+  @Controller(WORKSHOP_MODULE_URL)
 export class WorkshopController extends ParentController {
   // eslint-disable-next-line no-useless-constructor
   constructor(workshopResolver: WorkshopResolver) {
