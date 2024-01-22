@@ -2,13 +2,10 @@
 import { UserCmdRepository } from 'cy-domain/src/subject/domain-object/user/cmd-repository';
 import { UserReadRepository } from 'cy-domain/src/subject/domain-object/user/read-repository';
 import { UserAttrs } from 'cy-domain/src/subject/domain-data/user/params';
-import { ModuleResolver } from 'rilata/src/app/resolves/module-resolver';
 import { UserAR } from 'cy-domain/src/subject/domain-object/user/a-root';
+import { resolver } from 'rilata/tests/fixtures/test-resolver-mock';
 import { UuidType } from 'rilata/src/common/types';
-import { StorePayload, ThreadStore } from 'rilata/src/app/async-store/types';
-import { AnonymousUser, DomainUser } from 'rilata/src/app/caller';
 import { GetUsersActionDod } from 'cy-domain/src/subject/domain-data/user/get-users/s-params';
-import { TestResolverMock } from 'rilata/tests/fixtures/test-resolver-mock';
 import { Mock, spyOn } from 'bun:test';
 import { UserDoesNotExistError } from 'cy-domain/src/subject/domain-data/user/get-user/s-params';
 import { Result } from 'rilata/src/common/result/types';
@@ -27,8 +24,6 @@ export namespace SubjectServiceFixtures {
       throw new Error('Method not implemented.');
     }
   }
-
-  export const resolver: ModuleResolver = new TestResolverMock();
 
   export const resolverGetRepoMock = spyOn(
     resolver,

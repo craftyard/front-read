@@ -11,7 +11,8 @@ import { testUsersRecords } from 'cy-domain/src/subject/domain-object/user/json-
 import { TelegramId } from 'cy-domain/src/types';
 import { UserAuthentificationActionDod } from 'cy-domain/src/subject/domain-data/user/user-authentification/s-params';
 import { UserAR } from 'cy-domain/src/subject/domain-object/user/a-root';
-import { getTestStoreDispatcher } from 'rilata/tests/fixtures/test-thread-store-mock';
+import { setAndGetTestStoreDispatcher } from 'rilata/tests/fixtures/test-thread-store-mock';
+import { resolver } from 'rilata/tests/fixtures/test-resolver-mock';
 import { SubjectServiceFixtures as fixtures } from '../fixtures';
 import { UserAuthentificationService } from './service';
 
@@ -19,7 +20,7 @@ describe('user authentification service tests', () => {
   const getNowOriginal = UserAR.prototype.getNowDate;
   const userRepoMock = new fixtures.UserRepoMock();
   const sut = new UserAuthentificationService();
-  sut.init(fixtures.resolver);
+  sut.init(resolver);
 
   const tokenCreatorMock = {
     createToken(): JWTTokens {
@@ -30,13 +31,13 @@ describe('user authentification service tests', () => {
     },
   };
 
-  const resolveRealisationMock = spyOn(fixtures.resolver, 'getRealisation').mockImplementation((key: unknown) => {
+  const resolveRealisationMock = spyOn(resolver, 'getRealisation').mockImplementation((key: unknown) => {
     if (key === 'botToken') return 'some bot token';
     if (key === TokenCreator) return tokenCreatorMock;
     throw Error('not valid key');
   });
 
-  const getRepositoryMock = spyOn(fixtures.resolver, 'getRepository').mockReturnValue(userRepoMock);
+  const getRepositoryMock = spyOn(resolver, 'getRepository').mockReturnValue(userRepoMock);
   const findByTelegramIdMock = spyOn(
     userRepoMock,
     'findByTelegramId',
@@ -45,7 +46,7 @@ describe('user authentification service tests', () => {
       .filter((userRecord) => userRecord.telegramId === telegramId)
       .map((userRecord) => {
         const userAttrs = dtoUtility.excludeAttrs(userRecord, 'version');
-        return new UserAR(userAttrs, userRecord.version, fixtures.resolver.getLogger());
+        return new UserAR(userAttrs, userRecord.version, resolver.getLogger());
       }),
   );
 
@@ -68,7 +69,7 @@ describe('user authentification service tests', () => {
     auth_date: (new Date('2021-01-01').getTime() / 1000 - 1),
     hash: '94e3af7a0604b8494aa812f17159321958220291916aa78462c7cbc153d14056',
   };
-  getTestStoreDispatcher('pb8a83cf-25a3-2b4f-86e1-2744de6d8374', {
+  setAndGetTestStoreDispatcher('pb8a83cf-25a3-2b4f-86e1-2744de6d8374', {
     type: 'AnonymousUser',
   });
 
@@ -114,7 +115,7 @@ describe('user authentification service tests', () => {
           .filter((userRecord) => userRecord.telegramId === telegramId)
           .map((userRecord) => {
             const userAttrs = dtoUtility.excludeAttrs(userRecord, 'version');
-            return new UserAR(userAttrs, userRecord.version, fixtures.resolver.getLogger());
+            return new UserAR(userAttrs, userRecord.version, resolver.getLogger());
           });
       },
     );
@@ -222,7 +223,7 @@ describe('user authentification service tests', () => {
   });
 
   test('провал, запрос доступен только для неавторизованных пользователей', async () => {
-    getTestStoreDispatcher('pb8a83cf-25a3-2b4f-86e1-2744de6d8374');
+    setAndGetTestStoreDispatcher('pb8a83cf-25a3-2b4f-86e1-2744de6d8374');
     const result = await sut.execute(oneUserFindedActionDod);
     expect(result.isFailure()).toBe(true);
     expect(result.value).toEqual({

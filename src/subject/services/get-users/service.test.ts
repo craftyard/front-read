@@ -4,13 +4,14 @@ import {
 } from 'bun:test';
 import { GetingUsersOut } from 'cy-domain/src/subject/domain-data/user/get-users/s-params';
 import { UserAttrs } from 'cy-domain/src/subject/domain-data/user/params';
-import { getTestStoreDispatcher } from 'rilata/tests/fixtures/test-thread-store-mock';
+import { setAndGetTestStoreDispatcher } from 'rilata/tests/fixtures/test-thread-store-mock';
+import { resolver } from 'rilata/tests/fixtures/test-resolver-mock';
 import { GettingUserService } from './service';
 import { SubjectServiceFixtures as fixtures } from '../fixtures';
 
 describe('тесты для use-case getUsers', () => {
   const sut = new GettingUserService();
-  sut.init(fixtures.resolver);
+  sut.init(resolver);
   afterEach(() => {
     fixtures.resolverGetRepoMock.mockClear();
   });
@@ -39,7 +40,7 @@ describe('тесты для use-case getUsers', () => {
   test('успех, запрос для пользователя нормально проходит', async () => {
     const userRepo = fixtures.resolverGetRepoMock();
     const getUsersMock = spyOn(userRepo, 'getUsers').mockResolvedValueOnce([...users]);
-    getTestStoreDispatcher('pb8a83cf-25a3-2b4f-86e1-2744de6d8374');
+    setAndGetTestStoreDispatcher('pb8a83cf-25a3-2b4f-86e1-2744de6d8374');
     const result = await sut.execute({ ...fixtures.validActionDod });
     expect(result.isSuccess()).toBe(true);
     expect(result.value as GetingUsersOut).toEqual(users);
@@ -51,7 +52,7 @@ describe('тесты для use-case getUsers', () => {
   });
 
   test('провал, запрещен доступ неавторизованному пользователю', async () => {
-    getTestStoreDispatcher('pb8a83cf-25a3-2b4f-86e1-2744de6d8374', {
+    setAndGetTestStoreDispatcher('pb8a83cf-25a3-2b4f-86e1-2744de6d8374', {
       type: 'AnonymousUser',
     });
     const result = await sut.execute({ ...fixtures.validActionDod });
@@ -75,12 +76,12 @@ describe('тесты для use-case getUsers', () => {
   test('провал, не прошла валидация', async () => {
     const userRepo = fixtures.resolverGetRepoMock();
     const getUsersMock = spyOn(userRepo, 'getUsers').mockResolvedValueOnce([...users]);
-    getTestStoreDispatcher('pb8a83cf-25a3-2b4f-86e1-2744de6d8374');
+    setAndGetTestStoreDispatcher('pb8a83cf-25a3-2b4f-86e1-2744de6d8374');
     const notValidInputOpt = {
       ...fixtures.validActionDod,
       attrs: {
         userIds: [
-          'fa91a299-105b-4fb0-a056-9263429133c',
+          'fa91a299-105b-4fb0-a056-9263429133c', // not valid
           '493f5cbc-f572-4469-9cf1-3702802e6a31',
         ],
       },
