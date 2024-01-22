@@ -1,30 +1,20 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import {
-  describe, test, expect, spyOn,
+  describe, test, expect, spyOn, afterEach,
 } from 'bun:test';
-import { GetUsersActionDod, GetingUsersOut } from 'cy-domain/src/subject/domain-data/user/get-users/s-params';
+import { GetingUsersOut } from 'cy-domain/src/subject/domain-data/user/get-users/s-params';
 import { UserAttrs } from 'cy-domain/src/subject/domain-data/user/params';
+import { setAndGetTestStoreDispatcher } from 'rilata/tests/fixtures/test-thread-store-mock';
+import { resolver } from 'rilata/tests/fixtures/test-resolver-mock';
 import { GettingUserService } from './service';
-import { SubjectUseCaseFixtures as fixtures } from '../fixtures';
+import { SubjectServiceFixtures as fixtures } from '../fixtures';
 
 describe('тесты для use-case getUsers', () => {
   const sut = new GettingUserService();
-  const resolver = new fixtures.ResolverMock();
   sut.init(resolver);
-
-  const validActionDod: GetUsersActionDod = {
-    meta: {
-      name: 'getUsers',
-      actionId: 'd98f438a-c697-4da1-8245-fe993cf820c4',
-      domainType: 'action',
-    },
-    attrs: {
-      userIds: [
-        'fa91a299-105b-4fb0-a056-92634249130c',
-        '493f5cbc-f572-4469-9cf1-3702802e6a31',
-      ],
-    },
-  };
+  afterEach(() => {
+    fixtures.resolverGetRepoMock.mockClear();
+  });
 
   const users: UserAttrs[] = [
     {
@@ -48,12 +38,10 @@ describe('тесты для use-case getUsers', () => {
   ];
 
   test('успех, запрос для пользователя нормально проходит', async () => {
-    const getUsersMock = spyOn(
-      resolver.getRepository('repoKey'),
-      'getUsers',
-    ).mockResolvedValueOnce([...users]);
-
-    const result = await sut.execute(validActionDod);
+    const userRepo = fixtures.resolverGetRepoMock();
+    const getUsersMock = spyOn(userRepo, 'getUsers').mockResolvedValueOnce([...users]);
+    setAndGetTestStoreDispatcher('pb8a83cf-25a3-2b4f-86e1-2744de6d8374');
+    const result = await sut.execute({ ...fixtures.validActionDod });
     expect(result.isSuccess()).toBe(true);
     expect(result.value as GetingUsersOut).toEqual(users);
     expect(getUsersMock).toHaveBeenCalledTimes(1);
@@ -63,17 +51,39 @@ describe('тесты для use-case getUsers', () => {
     ]);
   });
 
-  test('провал, не прошла валидация', async () => {
-    const notValidInputOpt = {
-      ...validActionDod,
-      actionDod: {
-        actionName: 'getUsers' as const,
-        body: {
-          userIds: [
-            'fa91a299-105b-4fb0-a056-92634249l30c',
-            '493f5cbc-f572-4469-9cf1-3702802e6a31',
-          ],
+  test('провал, запрещен доступ неавторизованному пользователю', async () => {
+    setAndGetTestStoreDispatcher('pb8a83cf-25a3-2b4f-86e1-2744de6d8374', {
+      type: 'AnonymousUser',
+    });
+    const result = await sut.execute({ ...fixtures.validActionDod });
+    expect(result.isFailure()).toBe(true);
+    expect(result.value).toEqual({
+      locale: {
+        text: 'Действие не доступно',
+        hint: {
+          allowedOnlyFor: ['DomainUser'],
         },
+      },
+      name: 'Permission denied',
+      meta: {
+        errorType: 'domain-error',
+        domainType: 'error',
+      },
+    });
+    expect(fixtures.resolverGetRepoMock).toHaveBeenCalledTimes(0);
+  });
+
+  test('провал, не прошла валидация', async () => {
+    const userRepo = fixtures.resolverGetRepoMock();
+    const getUsersMock = spyOn(userRepo, 'getUsers').mockResolvedValueOnce([...users]);
+    setAndGetTestStoreDispatcher('pb8a83cf-25a3-2b4f-86e1-2744de6d8374');
+    const notValidInputOpt = {
+      ...fixtures.validActionDod,
+      attrs: {
+        userIds: [
+          'fa91a299-105b-4fb0-a056-9263429133c', // not valid
+          '493f5cbc-f572-4469-9cf1-3702802e6a31',
+        ],
       },
     };
     const result = await sut.execute(notValidInputOpt);
@@ -98,30 +108,10 @@ describe('тесты для use-case getUsers', () => {
         },
       },
     });
-  });
-
-  test('провал, запрещен доступ неавторизованному пользователю', async () => {
-    const notValidInputOpt = {
-      ...validActionDod,
-      caller: {
-        type: 'AnonymousUser' as const,
-        requestID: 'd98f438a-c697-4da1-8245-fe993cf820c4',
-      },
-    };
-    const result = await sut.execute(notValidInputOpt);
-    expect(result.isFailure()).toBe(true);
-    expect(result.value).toEqual({
-      locale: {
-        text: 'Действие не доступно',
-        hint: {
-          allowedOnlyFor: ['DomainUser'],
-        },
-      },
-      name: 'Permission denied',
-      meta: {
-        errorType: 'domain-error',
-        domainType: 'error',
-      },
-    });
+    expect(getUsersMock).toHaveBeenCalledTimes(1);
+    expect(getUsersMock.mock.calls[0][0]).toEqual([
+      'fa91a299-105b-4fb0-a056-92634249130c',
+      '493f5cbc-f572-4469-9cf1-3702802e6a31',
+    ]);
   });
 });
