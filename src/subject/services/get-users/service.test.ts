@@ -6,11 +6,11 @@ import { GetingUsersOut } from 'cy-domain/src/subject/domain-data/user/get-users
 import { UserAttrs } from 'cy-domain/src/subject/domain-data/user/params';
 import { setAndGetTestStoreDispatcher } from 'rilata/tests/fixtures/test-thread-store-mock';
 import { resolver } from 'rilata/tests/fixtures/test-resolver-mock';
-import { GettingUserService } from './service';
+import { GettingUsersService } from './service';
 import { SubjectServiceFixtures as fixtures } from '../fixtures';
 
 describe('тесты для use-case getUsers', () => {
-  const sut = new GettingUserService();
+  const sut = new GettingUsersService();
   sut.init(resolver);
   afterEach(() => {
     fixtures.resolverGetRepoMock.mockClear();

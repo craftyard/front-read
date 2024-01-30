@@ -3,7 +3,7 @@ import { GeneraQueryService, GeneralCommandService } from 'rilata/src/app/servic
 import { Module } from 'rilata/src/app/module/module';
 import { ModuleType } from 'rilata/src/app/module/types';
 import { SubjectResolver } from 'cy-domain/src/subject/resolver';
-import { GettingUserService } from './services/get-users/service';
+import { GettingUsersService } from './services/get-users/service';
 import { UserAuthentificationService } from './services/user-authentication/service';
 
 @Injectable()
@@ -20,7 +20,7 @@ export class SubjectReadModule extends Module {
   moduleName: string = 'subject';
 
   queryServices: GeneraQueryService[] = [
-    new GettingUserService(),
+    new GettingUsersService(),
     new UserAuthentificationService(),
   ];
 
