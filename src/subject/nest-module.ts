@@ -21,14 +21,14 @@ export class SubjectWorkshopReadNestModule {
     const userRepo = new UserJsonRepository(jsonUsers, logger);
     const jsonWorkshops = JSON.stringify(arrayWorkshops);
     const workshopReadRepo = new WorkshopJsonRepository(jsonWorkshops, logger);
-    const subjectWorkshopRead = new SubjectWorkshopReadResolver(jwtManager, userRepo, workshopReadRepo, logger, runMode);
+    const subjectWorkshopReadResolver = new SubjectWorkshopReadResolver(jwtManager, userRepo, workshopReadRepo, logger, runMode);
     return {
       module: SubjectWorkshopReadNestModule,
       providers: [
         SubjectReadModule,
         {
           provide: SubjectWorkshopReadResolver,
-          useValue: subjectWorkshopRead,
+          useValue: subjectWorkshopReadResolver,
         },
       ],
       controllers: [SubjectWorkshopReadController],
