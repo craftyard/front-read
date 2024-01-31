@@ -3,8 +3,10 @@ import { GeneraQueryService, GeneralCommandService } from 'rilata/src/app/servic
 import { Module } from 'rilata/src/app/module/module';
 import { ModuleType } from 'rilata/src/app/module/types';
 import { SubjectResolver } from 'cy-domain/src/subject/resolver';
-import { GettingUserService } from './services/get-users/service';
-import { UserAuthentificationService } from './services/user-authentication/service';
+import { GettingUserService } from './services/user/get-users/service';
+import { UserAuthentificationService } from './services/user/user-authentication/service';
+import { FindWorkshopByUserIdService } from './services/workshop/find-workshop-by-user-id/service';
+import { WorkshopResolver } from 'cy-domain/src/workshop/resolver';
 
 @Injectable()
 export class SubjectReadModule extends Module {
@@ -25,4 +27,22 @@ export class SubjectReadModule extends Module {
   ];
 
   commandServices: GeneralCommandService[] = [];
+}
+
+@Injectable()
+export class WorkshopReadModule extends Module {
+  constructor(workshopResolver: WorkshopResolver) {
+    super();
+    this.init(workshopResolver);
+  }
+
+  queryServices: GeneraQueryService[] = [
+    new FindWorkshopByUserIdService() as unknown as GeneraQueryService,
+  ];
+
+  commandServices: GeneralCommandService[] = [];
+
+  moduleType: ModuleType = 'read-module';
+
+  moduleName: string = 'workshop';
 }
