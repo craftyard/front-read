@@ -5,10 +5,10 @@ import { Response } from 'express';
 import { RequestCY } from 'backend-core/src/app/jwt/types';
 import { ActionDod } from 'rilata/src/domain/domain-data/domain-types';
 import { Controller as ParentController } from 'rilata/src/app/controller/controller';
-import { SUBJECT_WORKSHOP_READ_MODULE_URL } from 'cy-domain/src/subject/subject-config';
+import { moduleUrls  } from 'cy-domain/src/server-config';
 import { SubjectWorkshopReadResolver } from '../resolver';
 
-@Controller(SUBJECT_WORKSHOP_READ_MODULE_URL)
+@Controller(moduleUrls.subjectWorkshopRead)
 export class SubjectWorkshopReadController extends ParentController {
   // eslint-disable-next-line no-useless-constructor
   constructor(subjectResolver: SubjectWorkshopReadResolver) {
