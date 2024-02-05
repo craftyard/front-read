@@ -6,19 +6,44 @@ import { setAndGetTestStoreDispatcher } from 'rilata/tests/fixtures/test-thread-
 import { FindWorkshopByUserIdService } from './service';
 import {
   resolver, workshop, inputOptions,
-  resolverGetRepoMock,
+  resolverGetUserWorkshopRepoMock,
 } from './fixture';
+import { UserAttrs } from 'cy-domain/src/subject/domain-data/user/params';
+import { WorkshopReadRepository } from 'cy-domain/src/workshop/domain-object/workshop/repository';
+import { UserReadRepository } from 'cy-domain/src/subject/domain-object/user/read-repository';
 
 describe('Тесты для use-case getMyWorkshop', () => {
   const sut = new FindWorkshopByUserIdService();
   sut.init(resolver);
-  const workshopRepo = resolverGetRepoMock();
+  const workshopRepo = resolverGetUserWorkshopRepoMock(WorkshopReadRepository) as WorkshopReadRepository;
   const getWorkshopMock = spyOn(workshopRepo, 'findWorkshopByUserId');
   afterEach(() => {
     getWorkshopMock.mockClear();
   });
+  const users: UserAttrs[] = [
+    {
+      userId: 'fb8a83cf-25a3-2b4f-86e1-27f6de6d8374',
+      telegramId: 5436134100,
+      type: 'employee',
+      userProfile: {
+        firstName: 'Jack',
+        lastName: 'Smith',
+      },
+    },
+    {
+      userId: '3312a8d6-67ab-4e87-8a21-9d17f508fd5c',
+      telegramId: 3290593910,
+      type: 'employee',
+      userProfile: {
+        firstName: 'Bill',
+        lastName: 'Oruell',
+      },
+    },
+  ];
   test('успех, запрос для получения workshop-а успешно проходит', async () => {
     getWorkshopMock.mockResolvedValueOnce(dtoUtility.deepCopy(workshop));
+    const userRepo = resolverGetUserWorkshopRepoMock(UserReadRepository) as UserReadRepository;
+    const getUsersMock = spyOn(userRepo, 'getUsers').mockResolvedValueOnce([...users]);
     setAndGetTestStoreDispatcher('pb8a83cf-25a3-2b4f-86e1-2744de6d8374');
     const result = await sut.execute(inputOptions);
     expect(result.isSuccess()).toBe(true);
@@ -28,8 +53,9 @@ describe('Тесты для use-case getMyWorkshop', () => {
       city: 'Freital',
       address: 'Gerti-Bruns-Weg 4/7 70279 Freital',
       location: { latitude: 88.958285, longitude: 117.84182 },
-      employeesRole: { userIds: ['fb8a83cf-25a3-2b4f-86e1-27f6de6d8374', '3312a8d6-67ab-4e87-8a21-9d17f508fd5c'] },
+      employeesRole: { usersAttrs: users },
     });
+    expect(getUsersMock).toHaveBeenCalledTimes(1);
     expect(getWorkshopMock).toHaveBeenCalledTimes(1);
     expect(getWorkshopMock.mock.calls[0][0]).toBe('fb8a83cf-25a3-2b4f-86e1-27f6de6d8374');
   });

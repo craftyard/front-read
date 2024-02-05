@@ -8,6 +8,7 @@ import { DomainUser } from 'rilata/src/app/caller';
 import { failure } from 'rilata/src/common/result/failure';
 import { dodUtility } from 'rilata/src/common/utils/domain-object/dod-utility';
 import { storeDispatcher } from 'rilata/src/app/async-store/store-dispatcher';
+import { UserReadRepository } from 'cy-domain/src/subject/domain-object/user/read-repository';
 
 export class FindWorkshopByUserIdService extends QueryService<GetMyWorkshopServiceParams> {
   protected aRootName: 'WorkshopAR' = 'WorkshopAR' as const;
@@ -22,9 +23,9 @@ export class FindWorkshopByUserIdService extends QueryService<GetMyWorkshopServi
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     actionDod: GetMyWorkshopActionDod,
   ): Promise<ServiceResult<GetMyWorkshopServiceParams>> {
-    const repo = WorkshopReadRepository.instance(this.moduleResolver);
+    const repoWorkshop = WorkshopReadRepository.instance(this.moduleResolver);
     const { caller } = storeDispatcher.getStoreOrExepction();
-    const workshop = await repo.findWorkshopByUserId((caller as DomainUser).userId);
+    const workshop = await repoWorkshop.findWorkshopByUserId((caller as DomainUser).userId);
     if (!workshop) {
       return failure(dodUtility.getDomainErrorByType<WorkshopForUserDoesntExistError>(
         'WorkshopForUserDoesntExistError' as const,
@@ -32,6 +33,11 @@ export class FindWorkshopByUserIdService extends QueryService<GetMyWorkshopServi
         {},
       ));
     }
-    return success(workshop);
+    const repoUsers = UserReadRepository.instance(this.moduleResolver);
+    const usersAttrs = await repoUsers.getUsers(workshop.employeesRole.userIds);
+    return success({
+      ...workshop,
+      employeesRole: {usersAttrs: usersAttrs},
+    });
   }
 }

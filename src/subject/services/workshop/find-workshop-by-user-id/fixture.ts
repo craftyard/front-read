@@ -4,6 +4,13 @@ import { WorkshopReadRepository } from 'cy-domain/src/workshop/domain-object/wor
 import { ModuleResolver } from 'rilata/src/app/resolves/module-resolver';
 import { TestResolverMock } from 'rilata/tests/fixtures/test-resolver-mock';
 import { Mock, spyOn } from 'bun:test';
+import { UserCmdRepository } from 'cy-domain/src/subject/domain-object/user/cmd-repository';
+import { UserReadRepository } from 'cy-domain/src/subject/domain-object/user/read-repository';
+import { UserAR } from 'cy-domain/src/subject/domain-object/user/a-root';
+import { UserAttrs } from 'cy-domain/src/subject/domain-data/user/params';
+import { UserDoesNotExistError } from 'cy-domain/src/subject/domain-data/user/get-user/s-params';
+import { Result } from 'rilata/src/common/result/types';
+import { Repositoriable } from 'rilata/src/app/resolves/repositoriable';
 
 export class WorkshopRepoMock implements WorkshopReadRepository {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -11,13 +18,35 @@ export class WorkshopRepoMock implements WorkshopReadRepository {
     throw new Error('Method not implemented.');
   }
 }
-
 export const resolver: ModuleResolver = new TestResolverMock();
 
-export const resolverGetRepoMock = spyOn(
+export class UserRepoMock implements UserCmdRepository, UserReadRepository {
+    findByTelegramId(telegramId: number): Promise<UserAR[]> {
+      throw new Error('Method not implemented.');
+    }
+
+    getUsers(userIds: string[]): Promise<UserAttrs[]> {
+      throw new Error('Method not implemented.');
+    }
+
+    getUser(userId: string): Promise<Result<UserDoesNotExistError, UserAttrs>> {
+      throw new Error('Method not implemented.');
+    }
+  }
+
+const workshopRepo = new WorkshopRepoMock();
+
+const userRepo = new UserRepoMock();
+
+export const resolverGetUserWorkshopRepoMock = spyOn(
   resolver,
   'getRepository',
-).mockReturnValue(new WorkshopRepoMock()) as Mock<(...args: unknown[]) => WorkshopRepoMock>;
+).mockImplementation((key: unknown) => {
+  if (key === WorkshopReadRepository) return workshopRepo;
+  if (key === UserReadRepository) return userRepo;
+  throw Error('repository not found')
+}) as Mock<(...args: unknown[]) => UserRepoMock | WorkshopRepoMock>;
+
 
 export const inputOptions : GetMyWorkshopActionDod = {
   attrs: {
