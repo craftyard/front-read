@@ -43,17 +43,17 @@ describe('тесты для use-case getUser', () => {
       },
     };
     test('успех, запрос для пользователя нормально проходит', async () => {
-      const userRepo = fixtures.resolverGetRepoMock();
-      const getUserMock = spyOn(userRepo, 'getUser').mockResolvedValueOnce(success(dtoUtility.deepCopy(user)));
+      const userRepoMock = fixtures.resolverGetRepoMock();
+      const repoGetUserMock = spyOn(userRepoMock, 'getUser').mockResolvedValueOnce(success(dtoUtility.deepCopy(user)));
       setAndGetTestStoreDispatcher(actionId);
       const result = await sut.execute(dtoUtility.deepCopy(validActionDod));
       expect(result.isSuccess()).toBe(true);
       expect(result.value as GetingUserOut).toEqual(user);
-      expect(getUserMock).toHaveBeenCalledTimes(1);
-      expect(getUserMock.mock.calls[0][0]).toEqual(
+      expect(repoGetUserMock).toHaveBeenCalledTimes(1);
+      expect(repoGetUserMock.mock.calls[0][0]).toEqual(
         'fa91a299-105b-4fb0-a056-92634249130c'
       );
-      getUserMock.mockClear();
+      repoGetUserMock.mockClear();
     });
     test('провал, данный пользователь не существует', async () => {
       const userRepo = fixtures.resolverGetRepoMock();
@@ -62,7 +62,7 @@ describe('тесты для use-case getUser', () => {
         ...validActionDod,
         attrs: {userId: 'dd91a299-105b-4fb0-a056-9263429433c4'},//not valid
       };
-      const getErrorMock = spyOn(userRepo, 'getUser').mockResolvedValueOnce(failure(dodUtility.getDomainErrorByType(
+      const repoGetUserMock = spyOn(userRepo, 'getUser').mockResolvedValueOnce(failure(dodUtility.getDomainErrorByType(
         'UserDoesNotExistError',
         'Такого пользователя не существует',
         { userId: 'dd91a299-105b-4fb0-a056-9263429433c4' },
@@ -83,7 +83,7 @@ describe('тесты для use-case getUser', () => {
           domainType: "error",
         },
       });
-      getErrorMock.mockClear();
+      repoGetUserMock.mockClear();
     })
     test('провал, запрещен доступ неавторизованному пользователю', async () => {
       setAndGetTestStoreDispatcher(actionId, {
