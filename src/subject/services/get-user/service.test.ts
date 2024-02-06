@@ -11,6 +11,8 @@ import { SubjectServiceFixtures as fixtures } from '../fixtures';
 import { UuidType } from 'rilata/src/common/types';
 import { success } from 'rilata/src/common/result/success';
 import { dtoUtility } from 'rilata/src/common/utils/dto';
+import { failure } from 'rilata/src/common/result/failure';
+import { dodUtility } from 'rilata/src/common/utils/domain-object/dod-utility';
 
 describe('тесты для use-case getUser', () => {
     const sut = new GettingUserService();
@@ -43,7 +45,7 @@ describe('тесты для use-case getUser', () => {
     test('успех, запрос для пользователя нормально проходит', async () => {
       const userRepo = fixtures.resolverGetRepoMock();
       const getUserMock = spyOn(userRepo, 'getUser').mockResolvedValueOnce(success(dtoUtility.deepCopy(user)));
-      setAndGetTestStoreDispatcher('pb8a83cf-25a3-2b4f-86e1-2744de6d8374');
+      setAndGetTestStoreDispatcher(actionId);
       const result = await sut.execute(dtoUtility.deepCopy(validActionDod));
       expect(result.isSuccess()).toBe(true);
       expect(result.value as GetingUserOut).toEqual(user);
@@ -53,8 +55,38 @@ describe('тесты для use-case getUser', () => {
       );
       getUserMock.mockClear();
     });
+    test('провал, данный пользователь не существует', async () => {
+      const userRepo = fixtures.resolverGetRepoMock();
+      setAndGetTestStoreDispatcher(actionId);
+      const notValidInputOpt = {
+        ...validActionDod,
+        attrs: {userId: 'dd91a299-105b-4fb0-a056-9263429433c4'},//not valid
+      };
+      const getErrorMock = spyOn(userRepo, 'getUser').mockResolvedValueOnce(failure(dodUtility.getDomainErrorByType(
+        'UserDoesNotExistError',
+        'Такого пользователя не существует',
+        { userId: 'dd91a299-105b-4fb0-a056-9263429433c4' },
+      )
+      ));
+      const result = await sut.execute(notValidInputOpt);
+      expect(result.isFailure()).toBe(true);
+      expect(result.value).toEqual({
+        locale: {
+          text: "Такого пользователя не существует",
+          hint: {
+            userId: "dd91a299-105b-4fb0-a056-9263429433c4",
+          },
+        },
+        name: "UserDoesNotExistError",
+        meta: {
+          errorType: "domain-error",
+          domainType: "error",
+        },
+      });
+      getErrorMock.mockClear();
+    })
     test('провал, запрещен доступ неавторизованному пользователю', async () => {
-      setAndGetTestStoreDispatcher('pb8a83cf-25a3-2b4f-86e1-2744de6d8374', {
+      setAndGetTestStoreDispatcher(actionId, {
         type: 'AnonymousUser',
       });
       const result = await sut.execute(dtoUtility.deepCopy(validActionDod));
@@ -77,7 +109,7 @@ describe('тесты для use-case getUser', () => {
   
     test('провал, не прошла валидация', async () => {
       fixtures.resolverGetRepoMock();
-      setAndGetTestStoreDispatcher('pb8a83cf-25a3-2b4f-86e1-2744de6d8374');
+      setAndGetTestStoreDispatcher(actionId);
       const notValidInputOpt = {
         ...validActionDod,
         attrs: {userId: 'fa91a299-105b-4fb0-a056-9263429133c'},//not valid
