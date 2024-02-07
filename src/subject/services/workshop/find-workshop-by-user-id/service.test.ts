@@ -2,7 +2,7 @@ import {
   describe, test, expect, spyOn, afterEach,
 } from 'bun:test';
 import { dtoUtility } from 'rilata/src/common/utils/dto/dto-utility';
-import { getTestStoreDispatcher } from 'rilata/tests/fixtures/test-thread-store-mock';
+import { setAndGetTestStoreDispatcher } from 'rilata/tests/fixtures/test-thread-store-mock';
 import { FindWorkshopByUserIdService } from './service';
 import {
   resolver, workshop, inputOptions,
@@ -19,7 +19,7 @@ describe('Тесты для use-case getMyWorkshop', () => {
   });
   test('успех, запрос для получения workshop-а успешно проходит', async () => {
     getWorkshopMock.mockResolvedValueOnce(dtoUtility.deepCopy(workshop));
-    getTestStoreDispatcher('pb8a83cf-25a3-2b4f-86e1-2744de6d8374');
+    setAndGetTestStoreDispatcher('pb8a83cf-25a3-2b4f-86e1-2744de6d8374');
     const result = await sut.execute(inputOptions);
     expect(result.isSuccess()).toBe(true);
     expect(result.value).toEqual({
@@ -36,7 +36,7 @@ describe('Тесты для use-case getMyWorkshop', () => {
 
   test('провал, для текущего пользователя мастерская не найдена', async () => {
     getWorkshopMock.mockResolvedValueOnce(undefined);
-    getTestStoreDispatcher('pb8a83cf-25a3-2b4f-86e1-2744de6d8374');
+    setAndGetTestStoreDispatcher('pb8a83cf-25a3-2b4f-86e1-2744de6d8374');
     const result = await sut.execute(inputOptions);
     expect(result.isFailure()).toBe(true);
     expect(result.value).toEqual({
@@ -55,7 +55,7 @@ describe('Тесты для use-case getMyWorkshop', () => {
   });
 
   test('провал, запрещен доступ неавторизованному пользователю', async () => {
-    getTestStoreDispatcher('pb8a83cf-25a3-2b4f-86e1-2744de6d8374', {
+    setAndGetTestStoreDispatcher('pb8a83cf-25a3-2b4f-86e1-2744de6d8374', {
       type: 'AnonymousUser',
     });
     const result = await sut.execute(inputOptions);
