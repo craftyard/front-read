@@ -5,7 +5,7 @@ import { UserReadRepository } from 'cy-domain/src/subject/domain-object/user/rea
 import { getUsersValidator } from 'cy-domain/src/subject/domain-data/user/get-users/v-map';
 import { success } from 'rilata/src/common/result/success';
 
-export class GettingUserService extends QueryService<GetingUsersServiceParams> {
+export class GettingUsersService extends QueryService<GetingUsersServiceParams> {
   protected aRootName: 'UserAR' = 'UserAR' as const;
 
   protected name: 'getUsers' = 'getUsers' as const;
