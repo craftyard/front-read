@@ -22,6 +22,7 @@ export class SubjectReadModule extends Module {
 
   queryServices: GeneraQueryService[] = [
     new GettingUserService(),
+    new GettingUsersService(),
     new UserAuthentificationService(),
     new FindWorkshopByUserIdService() as unknown as GeneraQueryService,
   ];
