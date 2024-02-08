@@ -11,6 +11,7 @@ import {
 import { UserAttrs } from 'cy-domain/src/subject/domain-data/user/params';
 import { WorkshopReadRepository } from 'cy-domain/src/workshop/domain-object/workshop/repository';
 import { UserReadRepository } from 'cy-domain/src/subject/domain-object/user/read-repository';
+import { UuidType } from 'rilata/src/common/types';
 
 describe('Тесты для use-case getMyWorkshop', () => {
   const sut = new FindWorkshopByUserIdService();
@@ -40,11 +41,14 @@ describe('Тесты для use-case getMyWorkshop', () => {
       },
     },
   ];
+  
+  const actionId: UuidType = 'pb8a83cf-25a3-2b4f-86e1-2744de6d8374';
+
   test('успех, запрос для получения workshop-а успешно проходит', async () => {
     getWorkshopMock.mockResolvedValueOnce(dtoUtility.deepCopy(workshop));
     const userRepo = resolverGetUserWorkshopRepoMock(UserReadRepository) as UserReadRepository;
     const getUsersMock = spyOn(userRepo, 'getUsers').mockResolvedValueOnce([...users]);
-    setAndGetTestStoreDispatcher('pb8a83cf-25a3-2b4f-86e1-2744de6d8374');
+    setAndGetTestStoreDispatcher(actionId);
     const result = await sut.execute(inputOptions);
     expect(result.isSuccess()).toBe(true);
     expect(result.value).toEqual({
@@ -53,7 +57,7 @@ describe('Тесты для use-case getMyWorkshop', () => {
       city: 'Freital',
       address: 'Gerti-Bruns-Weg 4/7 70279 Freital',
       location: { latitude: 88.958285, longitude: 117.84182 },
-      employeesRole: { usersAttrs: users },
+      employeesRole: users,
     });
     expect(getUsersMock).toHaveBeenCalledTimes(1);
     expect(getWorkshopMock).toHaveBeenCalledTimes(1);
@@ -62,7 +66,7 @@ describe('Тесты для use-case getMyWorkshop', () => {
 
   test('провал, для текущего пользователя мастерская не найдена', async () => {
     getWorkshopMock.mockResolvedValueOnce(undefined);
-    setAndGetTestStoreDispatcher('pb8a83cf-25a3-2b4f-86e1-2744de6d8374');
+    setAndGetTestStoreDispatcher(actionId);
     const result = await sut.execute(inputOptions);
     expect(result.isFailure()).toBe(true);
     expect(result.value).toEqual({
@@ -81,7 +85,7 @@ describe('Тесты для use-case getMyWorkshop', () => {
   });
 
   test('провал, запрещен доступ неавторизованному пользователю', async () => {
-    setAndGetTestStoreDispatcher('pb8a83cf-25a3-2b4f-86e1-2744de6d8374', {
+    setAndGetTestStoreDispatcher(actionId, {
       type: 'AnonymousUser',
     });
     const result = await sut.execute(inputOptions);

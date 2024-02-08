@@ -4,10 +4,8 @@ import { FindWorkshopByUserIdActionDod, FindWorkshopByUserIdServiceParams, Works
 import { WorkshopReadRepository } from 'cy-domain/src/workshop/domain-object/workshop/repository';
 import { findWorkshopByUserIdValidator } from 'cy-domain/src/workshop/domain-data/workshop/find-workshop-by-user-id/s-vmap';
 import { success } from 'rilata/src/common/result/success';
-import { DomainUser } from 'rilata/src/app/caller';
 import { failure } from 'rilata/src/common/result/failure';
 import { dodUtility } from 'rilata/src/common/utils/domain-object/dod-utility';
-import { storeDispatcher } from 'rilata/src/app/async-store/store-dispatcher';
 import { UserReadRepository } from 'cy-domain/src/subject/domain-object/user/read-repository';
 
 export class FindWorkshopByUserIdService extends QueryService<FindWorkshopByUserIdServiceParams> {
@@ -24,8 +22,7 @@ export class FindWorkshopByUserIdService extends QueryService<FindWorkshopByUser
     actionDod: FindWorkshopByUserIdActionDod,
   ): Promise<ServiceResult<FindWorkshopByUserIdServiceParams>> {
     const repoWorkshop = WorkshopReadRepository.instance(this.moduleResolver);
-    const { caller } = storeDispatcher.getStoreOrExepction();
-    const workshop = await repoWorkshop.findWorkshopByUserId((caller as DomainUser).userId);
+    const workshop = await repoWorkshop.findWorkshopByUserId(actionDod.attrs.userId);
     if (!workshop) {
       return failure(dodUtility.getDomainErrorByType<WorkshopForUserDoesntExistError>(
         'WorkshopForUserDoesntExistError' as const,
@@ -37,7 +34,7 @@ export class FindWorkshopByUserIdService extends QueryService<FindWorkshopByUser
     const usersAttrs = await repoUsers.getUsers(workshop.employeesRole.userIds);
     return success({
       ...workshop,
-      employeesRole: {usersAttrs: usersAttrs},
+      employeesRole: usersAttrs,
     });
   }
 }
