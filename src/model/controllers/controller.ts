@@ -1,18 +1,18 @@
 import {
-  Body, Controller, Post, Req, Res,
+  Controller, Post, Body, Res, Req,
 } from '@nestjs/common';
-import { Response } from 'express';
 import { RequestCY } from 'backend-core/src/app/jwt/types';
+import { moduleUrls } from 'cy-domain/src/server-config';
 import { ActionDod } from 'rilata/src/domain/domain-data/domain-types';
 import { Controller as ParentController } from 'rilata/src/app/controller/controller';
-import { moduleUrls } from 'cy-domain/src/server-config';
-import { SubjectWorkshopReadResolver } from '../resolver';
+import { Response } from 'express';
+import { ModelResolver } from '../resolver';
 
 @Controller(moduleUrls.model)
-export class SubjectWorkshopReadController extends ParentController {
+export class ModelController extends ParentController {
   // eslint-disable-next-line no-useless-constructor
-  constructor(subjectResolver: SubjectWorkshopReadResolver) {
-    super(subjectResolver);
+  constructor(modelResolver: ModelResolver) {
+    super(modelResolver);
   }
 
   @Post()
