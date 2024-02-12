@@ -3,20 +3,21 @@ import {
 } from 'bun:test';
 import { dtoUtility } from 'rilata/src/common/utils/dto/dto-utility';
 import { setAndGetTestStoreDispatcher } from 'rilata/tests/fixtures/test-thread-store-mock';
-import { FindWorkshopByUserIdService } from './service';
-import {
-  resolver, workshop, inputOptions,
-  resolverGetUserWorkshopRepoMock,
-} from './fixture';
 import { UserAttrs } from 'cy-domain/src/subject/domain-data/user/params';
 import { WorkshopReadRepository } from 'cy-domain/src/workshop/domain-object/workshop/repository';
 import { UserReadRepository } from 'cy-domain/src/subject/domain-object/user/read-repository';
 import { UuidType } from 'rilata/src/common/types';
+import {
+  resolver, workshop, inputOptions,
+  resolverGetUserWorkshopRepoMock,
+} from './fixture';
+import { FindWorkshopByUserIdService } from './service';
 
 describe('Тесты для use-case getMyWorkshop', () => {
   const sut = new FindWorkshopByUserIdService();
   sut.init(resolver);
-  const workshopRepo = resolverGetUserWorkshopRepoMock(WorkshopReadRepository) as WorkshopReadRepository;
+  const workshopRepo = resolverGetUserWorkshopRepoMock(WorkshopReadRepository) as
+  WorkshopReadRepository;
   const getWorkshopMock = spyOn(workshopRepo, 'findWorkshopByUserId');
   afterEach(() => {
     getWorkshopMock.mockClear();
@@ -41,7 +42,7 @@ describe('Тесты для use-case getMyWorkshop', () => {
       },
     },
   ];
-  
+
   const actionId: UuidType = 'pb8a83cf-25a3-2b4f-86e1-2744de6d8374';
 
   test('успех, запрос для получения workshop-а успешно проходит', async () => {
@@ -64,26 +65,13 @@ describe('Тесты для use-case getMyWorkshop', () => {
     expect(getWorkshopMock.mock.calls[0][0]).toBe('fb8a83cf-25a3-2b4f-86e1-27f6de6d8374');
   });
 
-  test('провал, для текущего пользователя мастерская не найдена', async () => {
+  test('Успешно, возвращаю undefined если нету workshop-а', async () => {
     getWorkshopMock.mockResolvedValueOnce(undefined);
     setAndGetTestStoreDispatcher(actionId);
     const result = await sut.execute(inputOptions);
-    expect(result.isFailure()).toBe(true);
-    expect(result.value).toEqual({
-      locale: {
-        text: 'Мастерская не найдена',
-        hint: {},
-      },
-      name: 'WorkshopForUserDoesntExistError',
-      meta: {
-        domainType: 'error',
-        errorType: 'domain-error',
-      },
-    });
-    expect(getWorkshopMock).toHaveBeenCalledTimes(1);
-    expect(getWorkshopMock.mock.calls[0][0]).toBe('fb8a83cf-25a3-2b4f-86e1-27f6de6d8374');
+    expect(result.isSuccess()).toBe(true);
+    expect(result.value).toBeUndefined();
   });
-
   test('провал, запрещен доступ неавторизованному пользователю', async () => {
     setAndGetTestStoreDispatcher(actionId, {
       type: 'AnonymousUser',
