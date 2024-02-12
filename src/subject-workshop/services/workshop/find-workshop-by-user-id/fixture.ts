@@ -20,18 +20,21 @@ export class WorkshopRepoMock implements WorkshopReadRepository {
 export const resolver: ModuleResolver = new TestResolverMock();
 
 export class UserRepoMock implements UserCmdRepository, UserReadRepository {
-    findByTelegramId(telegramId: number): Promise<UserAR[]> {
-      throw new Error('Method not implemented.');
-    }
-
-    getUsers(userIds: string[]): Promise<UserAttrs[]> {
-      throw new Error('Method not implemented.');
-    }
-
-    getUser(userId: string): Promise<Result<UserDoesNotExistError, UserAttrs>> {
-      throw new Error('Method not implemented.');
-    }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  findByTelegramId(telegramId: number): Promise<UserAR[]> {
+    throw new Error('Method not implemented.');
   }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  getUsers(userIds: string[]): Promise<UserAttrs[]> {
+    throw new Error('Method not implemented.');
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  getUser(userId: string): Promise<Result<UserDoesNotExistError, UserAttrs>> {
+    throw new Error('Method not implemented.');
+  }
+}
 
 const workshopRepo = new WorkshopRepoMock();
 
@@ -43,9 +46,8 @@ export const resolverGetUserWorkshopRepoMock = spyOn(
 ).mockImplementation((key: unknown) => {
   if (key === WorkshopReadRepository) return workshopRepo;
   if (key === UserReadRepository) return userRepo;
-  throw Error('repository not found')
+  throw Error('repository not found');
 }) as Mock<(...args: unknown[]) => UserRepoMock | WorkshopRepoMock>;
-
 
 export const inputOptions : FindWorkshopByUserIdActionDod = {
   attrs: {
