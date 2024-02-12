@@ -61,6 +61,8 @@ describe('Тесты для use-case getMyWorkshop', () => {
       employeesRole: users,
     });
     expect(getUsersMock).toHaveBeenCalledTimes(1);
+    expect(getUsersMock.mock.calls[0][0]).toEqual(['fb8a83cf-25a3-2b4f-86e1-27f6de6d8374', '3312a8d6-67ab-4e87-8a21-9d17f508fd5c',
+    ]);
     expect(getWorkshopMock).toHaveBeenCalledTimes(1);
     expect(getWorkshopMock.mock.calls[0][0]).toBe('fb8a83cf-25a3-2b4f-86e1-27f6de6d8374');
   });
