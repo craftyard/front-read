@@ -5,7 +5,7 @@ import { Response } from 'express';
 import { RequestCY } from 'backend-core/src/app/jwt/types';
 import { ActionDod } from 'rilata/src/domain/domain-data/domain-types';
 import { Controller as ParentController } from 'rilata/src/app/controller/controller';
-import { moduleUrls  } from 'cy-domain/src/server-config';
+import { moduleUrls } from 'cy-domain/src/server-config';
 import { SubjectWorkshopReadResolver } from '../resolver';
 
 @Controller(moduleUrls.subjectWorkshopRead)

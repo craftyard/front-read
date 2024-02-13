@@ -5,8 +5,8 @@ import arrayWorkshops from 'cy-domain/src/workshop/domain-data/workshop/workshop
 import { UserJsonRepository } from 'cy-domain/src/subject/domain-object/user/json-impl/repo';
 import { JSONWebTokenLibJWTManager } from 'backend-core/src/infra/jwt/jsonwebtoken-lib.jwt.manager';
 import { RunMode } from 'rilata/src/app/types';
-import { SubjectReadModule } from './module';
 import { WorkshopJsonRepository } from 'cy-domain/src/workshop/domain-object/workshop/json-impl/repo';
+import { SubjectReadModule } from './module';
 import { SubjectWorkshopReadResolver } from './resolver';
 import { SubjectWorkshopReadController } from './controllers/controller';
 
@@ -21,6 +21,7 @@ export class SubjectWorkshopReadNestModule {
     const userRepo = new UserJsonRepository(jsonUsers, logger);
     const jsonWorkshops = JSON.stringify(arrayWorkshops);
     const workshopReadRepo = new WorkshopJsonRepository(jsonWorkshops, logger);
+    // eslint-disable-next-line max-len
     const subjectWorkshopReadResolver = new SubjectWorkshopReadResolver(jwtManager, userRepo, workshopReadRepo, logger, runMode);
     return {
       module: SubjectWorkshopReadNestModule,

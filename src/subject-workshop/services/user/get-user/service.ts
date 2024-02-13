@@ -17,6 +17,6 @@ export class GettingUserService extends QueryService<GetingUserServiceParams> {
     actionDod: GetUserActionDod,
   ): Promise<ServiceResult<GetingUserServiceParams>> {
     const repo = UserReadRepository.instance(this.moduleResolver);
-    return await repo.getUser(actionDod.attrs.userId);
+    return repo.getUser(actionDod.attrs.userId);
   }
 }
