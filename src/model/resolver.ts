@@ -5,12 +5,16 @@ import { RunMode } from 'rilata/src/app/types';
 import { Logger } from 'rilata/src/common/logger/logger';
 import { ModelReadRepository } from 'cy-domain/src/model/domain-object/model/read-repository';
 import { AssertionException } from 'rilata/src/common/exeptions';
+import { JWTPayload } from 'cy-domain/src/subject/domain-data/user/user-authentification/a-params';
+import { TokenCreator } from 'rilata/src/app/jwt/token-creator.interface';
+import { TokenVerifier } from 'rilata/src/app/jwt/token-verifier.interface';
 
-export class ModelResolver implements ModuleResolver {
+export class ModelReadResolver implements ModuleResolver {
   private module!: Module;
 
   // eslint-disable-next-line no-useless-constructor
   constructor(
+    protected tokenManager: TokenCreator<JWTPayload> & TokenVerifier<JWTPayload>,
     protected modelReadRepo: ModelReadRepository,
     protected logger: Logger,
     protected runMode: RunMode,
@@ -44,7 +48,10 @@ export class ModelResolver implements ModuleResolver {
     throw new Error('Method not implemented.');
   }
 
-  getRealisation(): unknown {
-    throw new Error('Method not implemented.');
+  getRealisation(key: unknown): unknown {
+    if (key === TokenCreator || key === TokenVerifier) return this.tokenManager;
+    const errStr = `not finded key for getRealisation method of ModelResolver, key: ${key}`;
+    this.logger.error(errStr);
+    throw new AssertionException(errStr);
   }
 }

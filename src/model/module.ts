@@ -2,13 +2,13 @@ import { Module } from 'rilata/src/app/module/module';
 import { Injectable } from '@nestjs/common';
 import { ModuleType } from 'rilata/src/app/module/types';
 import { GeneraQueryService, GeneralCommandService } from 'rilata/src/app/service/types';
-import { ModelResolver } from './resolver';
+import { ModelReadResolver } from './resolver';
 import { GettingWorkshopModelsService } from './services/get-workshop-models/service';
 
 @Injectable()
-export class ModelModule extends Module {
+export class ModelReadModule extends Module {
   constructor(
-    modelResolver: ModelResolver,
+    modelResolver: ModelReadResolver,
   ) {
     super();
     this.init(modelResolver);

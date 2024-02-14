@@ -8,7 +8,7 @@ import { Controller as ParentController } from 'rilata/src/app/controller/contro
 import { moduleUrls } from 'cy-domain/src/server-config';
 import { SubjectWorkshopReadResolver } from '../resolver';
 
-@Controller(moduleUrls.model)
+@Controller(moduleUrls.subjectWorkshopRead)
 export class SubjectWorkshopReadController extends ParentController {
   // eslint-disable-next-line no-useless-constructor
   constructor(subjectResolver: SubjectWorkshopReadResolver) {

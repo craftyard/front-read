@@ -6,12 +6,12 @@ import { moduleUrls } from 'cy-domain/src/server-config';
 import { ActionDod } from 'rilata/src/domain/domain-data/domain-types';
 import { Controller as ParentController } from 'rilata/src/app/controller/controller';
 import { Response } from 'express';
-import { ModelResolver } from '../resolver';
+import { ModelReadResolver } from '../resolver';
 
 @Controller(moduleUrls.model)
-export class ModelController extends ParentController {
+export class ModelReadController extends ParentController {
   // eslint-disable-next-line no-useless-constructor
-  constructor(modelResolver: ModelResolver) {
+  constructor(modelResolver: ModelReadResolver) {
     super(modelResolver);
   }
 
