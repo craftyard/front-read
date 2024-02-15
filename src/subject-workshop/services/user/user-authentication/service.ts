@@ -7,10 +7,10 @@ import {
   UserAuthentificationServiceParams,
 } from 'cy-domain/src/subject/domain-data/user/user-authentification/s-params';
 import { userAuthentificationValidator } from 'cy-domain/src/subject/domain-data/user/user-authentification/v-map';
-import { UserCmdRepository } from 'cy-domain/src/subject/domain-object/user/cmd-repository';
 import { UserAuthentificationDomainQuery } from 'cy-domain/src/subject/domain-data/user/user-authentification/a-params';
 import { failure } from 'rilata/src/common/result/failure';
 import { dodUtility } from 'rilata/src/common/utils/domain-object/dod-utility';
+import { UserReadRepository } from 'cy-domain/src/subject/domain-object/user/read-repository';
 
 export class UserAuthentificationService extends QueryService<UserAuthentificationServiceParams> {
   protected name: 'userAuthentification' = 'userAuthentification' as const;
@@ -24,7 +24,7 @@ export class UserAuthentificationService extends QueryService<UserAuthentificati
   protected async runDomain(
     actionDod: UserAuthentificationActionDod,
   ): Promise<ServiceResult<UserAuthentificationServiceParams>> {
-    const userRepo = UserCmdRepository.instance(this.moduleResolver);
+    const userRepo = UserReadRepository.instance(this.moduleResolver);
     const telegramId = actionDod.attrs.id;
     const users = await userRepo.findByTelegramId(telegramId);
 
