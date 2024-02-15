@@ -9,9 +9,13 @@ import { GetUsersActionDod } from 'cy-domain/src/subject/domain-data/user/get-us
 import { Mock, spyOn } from 'bun:test';
 import { UserDoesNotExistError } from 'cy-domain/src/subject/domain-data/user/get-user/s-params';
 import { Result } from 'rilata/src/common/result/types';
+import { CurrentUser } from 'cy-domain/src/subject/domain-data/user/get-current-user/s-params';
 
 export namespace SubjectServiceFixtures {
   export class UserRepoMock implements UserCmdRepository, UserReadRepository {
+    getCurrentUser(userId: string): Promise<CurrentUser> {
+      throw new Error('Method not implemented.');
+    }
     findByTelegramId(telegramId: number): Promise<UserAR[]> {
       throw new Error('Method not implemented.');
     }
