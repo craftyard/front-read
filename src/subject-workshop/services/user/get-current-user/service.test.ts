@@ -1,4 +1,5 @@
 import {
+  afterEach,
   describe,
   expect, spyOn,
   test,
@@ -43,16 +44,23 @@ describe('Тесты для use-case репозитория getCurrentUser', () 
     attrs: {
     },
   };
+  const workshopRepo = fixtures.resolverGetUserWorkshopRepoMock(WorkshopReadRepository) as
+  WorkshopReadRepository;
+  const getWorkshopMock = spyOn(workshopRepo, 'findById');
+  const userRepo = fixtures.resolverGetUserWorkshopRepoMock(UserReadRepository) as
+  UserReadRepository;
+  const repoGetUserMock = spyOn(userRepo, 'getUser');
+  afterEach(() => {
+    getWorkshopMock.mockClear();
+    repoGetUserMock.mockClear();
+  });
 
   test('успех, запрос для пользователя нормально проходит', async () => {
-    const userRepo = fixtures.resolverGetUserWorkshopRepoMock(UserReadRepository) as
-    UserReadRepository;
-    const repoGetUserMock = spyOn(userRepo, 'getUser').mockResolvedValueOnce(success(
+    repoGetUserMock.mockResolvedValueOnce(success(
       dtoUtility.excludeAttrs(currentUser, ['workshopId', 'name']),
     ));
-    const workshopRepo = fixtures.resolverGetUserWorkshopRepoMock(WorkshopReadRepository) as
-    WorkshopReadRepository;
-    const getWorkshopMock = spyOn(workshopRepo, 'findById').mockResolvedValueOnce(dtoUtility.deepCopy(fixtures.workshop));
+
+    getWorkshopMock.mockResolvedValueOnce(dtoUtility.deepCopy(fixtures.workshop));
     setAndGetTestStoreDispatcher(actionId);
     const result = await sut.execute(dtoUtility.deepCopy(validActionDod));
     expect(result.isSuccess()).toBe(true);
@@ -65,14 +73,7 @@ describe('Тесты для use-case репозитория getCurrentUser', () 
   });
 
   test('Провал, мастерской с таким id не существует', async () => {
-    const userRepo = fixtures.resolverGetUserWorkshopRepoMock(UserReadRepository) as
-      UserReadRepository;
-    const repoGetUserMock = spyOn(userRepo, 'getUser').mockResolvedValueOnce(success(
-      dtoUtility.deepCopy(dtoUtility.excludeAttrs(currentUser, ['workshopId', 'name'])),
-    ));
-    const workshopRepo = fixtures.resolverGetUserWorkshopRepoMock(WorkshopReadRepository) as
-    WorkshopReadRepository;
-    const getWorkshopMock = spyOn(workshopRepo, 'findById').mockResolvedValueOnce(undefined);
+    repoGetUserMock.mockResolvedValueOnce(success(dtoUtility.deepCopy(dtoUtility.excludeAttrs(currentUser, ['workshopId', 'name']))));
     getWorkshopMock.mockResolvedValueOnce(undefined);
     setAndGetTestStoreDispatcher(actionId);
     try {
@@ -83,7 +84,7 @@ describe('Тесты для use-case репозитория getCurrentUser', () 
       expect(error).toBeDefined();
       expect(error.toString()).toContain('Error: Workshop-a с workshopId: a29e2bfc-9f52-4f58-afbd-7a6f6f25d51e не существует');
     }
-    expect(getWorkshopMock).toHaveBeenCalledTimes(2);
+    expect(getWorkshopMock).toHaveBeenCalledTimes(1);
     expect(getWorkshopMock.mock.calls[0][0]).toEqual(
       'a29e2bfc-9f52-4f58-afbd-7a6f6f25d51e',
     );
@@ -94,19 +95,15 @@ describe('Тесты для use-case репозитория getCurrentUser', () 
   });
 
   test('Провал, пользователя с таким id не существует', async () => {
-    const userRepo = fixtures.resolverGetUserWorkshopRepoMock(UserReadRepository) as
-    UserReadRepository;
-    const repoGetUserMock = spyOn(userRepo, 'getUser').mockResolvedValueOnce(failure(dodUtility.getDomainErrorByType<UserDoesNotExistError>(
-      'UserDoesNotExistError',
-      'Такого пользователя не существует',
-      {
-        userId: currentUser.userId,
-      },
-    )));
-    const workshopRepo = fixtures.resolverGetUserWorkshopRepoMock(WorkshopReadRepository) as
-    WorkshopReadRepository;
-    const getWorkshopMock = spyOn(workshopRepo, 'findById').mockResolvedValueOnce(dtoUtility.deepCopy(fixtures.workshop));
-    getWorkshopMock.mockResolvedValueOnce(undefined);
+    repoGetUserMock
+      .mockResolvedValueOnce(failure(dodUtility.getDomainErrorByType<UserDoesNotExistError>(
+        'UserDoesNotExistError',
+        'Такого пользователя не существует',
+        {
+          userId: currentUser.userId,
+        },
+      )));
+    getWorkshopMock.mockResolvedValueOnce(dtoUtility.deepCopy(fixtures.workshop));
     setAndGetTestStoreDispatcher(actionId);
     try {
       await sut.execute(validActionDod);
@@ -116,11 +113,8 @@ describe('Тесты для use-case репозитория getCurrentUser', () 
       expect(error).toBeDefined();
       expect(error.toString()).toContain('Error: Пользователь с id: fb8a83cf-25a3-2b4f-86e1-27f6de6d8374 подписанным токеном авторизации в базе данных не существует');
     }
-    expect(getWorkshopMock).toHaveBeenCalledTimes(2);
-    expect(getWorkshopMock.mock.calls[0][0]).toEqual(
-      'a29e2bfc-9f52-4f58-afbd-7a6f6f25d51e',
-    );
-    expect(repoGetUserMock).toHaveBeenCalledTimes(2);
+    expect(getWorkshopMock).toHaveBeenCalledTimes(0);
+    expect(repoGetUserMock).toHaveBeenCalledTimes(1);
     expect(repoGetUserMock.mock.calls[0][0]).toEqual(
       'fb8a83cf-25a3-2b4f-86e1-27f6de6d8374',
     );
