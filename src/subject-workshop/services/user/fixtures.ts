@@ -52,7 +52,7 @@ export namespace SubjectServiceFixtures {
   ).mockImplementation((key: unknown) => {
     if (key === WorkshopReadRepository) return workshopRepo;
     if (key === UserReadRepository) return userRepo;
-    throw Error('repository not found');
+    throw Error(`repository not found for key: ${key}`);
   }) as Mock<(...args: unknown[]) => UserRepoMock | WorkshopRepoMock>;
 
 const actionId: UuidType = 'pb8a83cf-25a3-2b4f-86e1-2744de6d8374';

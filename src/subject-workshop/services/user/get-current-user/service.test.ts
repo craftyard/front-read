@@ -3,7 +3,7 @@ import {
   expect, spyOn,
   test,
 } from 'bun:test';
-import { CurrentUser, GetCurrentUserActionDod, GetingCurrentUserOut } from 'cy-domain/src/subject/domain-data/user/get-current-user/s-params';
+import { CurrentUser, GetCurrentUserActionDod, GettingCurrentUserOut } from 'cy-domain/src/subject/domain-data/user/get-current-user/s-params';
 import { UserReadRepository } from 'cy-domain/src/subject/domain-object/user/read-repository';
 import { WorkshopReadRepository } from 'cy-domain/src/workshop/domain-object/workshop/repository';
 import { success } from 'rilata/src/common/result/success';
@@ -29,7 +29,7 @@ describe('Тесты для use-case репозитория getCurrentUser', () 
       lastName: 'Smith',
     },
     workshopId: '6f91d305-3f4b-4a3d-9bef-72cf3757cc33',
-    workshopName: 'TheBestWorkshop',
+    name: 'TheBestWorkshop',
   };
 
   const actionId: UuidType = 'pb8a83cf-25a3-2b4f-86e1-2744de6d8374';
@@ -47,14 +47,16 @@ describe('Тесты для use-case репозитория getCurrentUser', () 
   test('успех, запрос для пользователя нормально проходит', async () => {
     const userRepo = fixtures.resolverGetUserWorkshopRepoMock(UserReadRepository) as
     UserReadRepository;
-    const repoGetUserMock = spyOn(userRepo, 'getUser').mockResolvedValueOnce(success(dtoUtility.deepCopy(dtoUtility.excludeAttrs(currentUser, ['workshopId', 'workshopName']))));
+    const repoGetUserMock = spyOn(userRepo, 'getUser').mockResolvedValueOnce(success(
+      dtoUtility.excludeAttrs(currentUser, ['workshopId', 'name']),
+    ));
     const workshopRepo = fixtures.resolverGetUserWorkshopRepoMock(WorkshopReadRepository) as
     WorkshopReadRepository;
     const getWorkshopMock = spyOn(workshopRepo, 'findById').mockResolvedValueOnce(dtoUtility.deepCopy(fixtures.workshop));
     setAndGetTestStoreDispatcher(actionId);
     const result = await sut.execute(dtoUtility.deepCopy(validActionDod));
     expect(result.isSuccess()).toBe(true);
-    expect(result.value as GetingCurrentUserOut).toEqual(currentUser);
+    expect(result.value as GettingCurrentUserOut).toEqual(currentUser);
     expect(getWorkshopMock).toHaveBeenCalledTimes(1);
     expect(getWorkshopMock.mock.calls[0][0]).toEqual(
       'a29e2bfc-9f52-4f58-afbd-7a6f6f25d51e',
@@ -65,7 +67,9 @@ describe('Тесты для use-case репозитория getCurrentUser', () 
   test('Провал, мастерской с таким id не существует', async () => {
     const userRepo = fixtures.resolverGetUserWorkshopRepoMock(UserReadRepository) as
       UserReadRepository;
-    const repoGetUserMock = spyOn(userRepo, 'getUser').mockResolvedValueOnce(success(dtoUtility.deepCopy(dtoUtility.excludeAttrs(currentUser, ['workshopId', 'workshopName']))));
+    const repoGetUserMock = spyOn(userRepo, 'getUser').mockResolvedValueOnce(success(
+      dtoUtility.deepCopy(dtoUtility.excludeAttrs(currentUser, ['workshopId', 'name'])),
+    ));
     const workshopRepo = fixtures.resolverGetUserWorkshopRepoMock(WorkshopReadRepository) as
     WorkshopReadRepository;
     const getWorkshopMock = spyOn(workshopRepo, 'findById').mockResolvedValueOnce(undefined);
@@ -77,7 +81,7 @@ describe('Тесты для use-case репозитория getCurrentUser', () 
     } catch (e) {
       const error = e as Error;
       expect(error).toBeDefined();
-      expect(error.toString()).toContain('Error: Workshop-a с таким workshopId: a29e2bfc-9f52-4f58-afbd-7a6f6f25d51e не существует');
+      expect(error.toString()).toContain('Error: Workshop-a с workshopId: a29e2bfc-9f52-4f58-afbd-7a6f6f25d51e не существует');
     }
     expect(getWorkshopMock).toHaveBeenCalledTimes(2);
     expect(getWorkshopMock.mock.calls[0][0]).toEqual(
@@ -110,7 +114,7 @@ describe('Тесты для use-case репозитория getCurrentUser', () 
     } catch (e) {
       const error = e as Error;
       expect(error).toBeDefined();
-      expect(error.toString()).toContain('Error: Пользователь с id: fb8a83cf-25a3-2b4f-86e1-27f6de6d8374 подписонным токеном авторизации в базе данных не существует');
+      expect(error.toString()).toContain('Error: Пользователь с id: fb8a83cf-25a3-2b4f-86e1-27f6de6d8374 подписанным токеном авторизации в базе данных не существует');
     }
     expect(getWorkshopMock).toHaveBeenCalledTimes(2);
     expect(getWorkshopMock.mock.calls[0][0]).toEqual(
