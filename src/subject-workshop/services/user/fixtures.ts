@@ -8,7 +8,7 @@ import { GetUsersActionDod } from 'cy-domain/src/subject/domain-data/user/get-us
 import { Mock, spyOn } from 'bun:test';
 import { UserDoesNotExistError } from 'cy-domain/src/subject/domain-data/user/get-user/s-params';
 import { Result } from 'rilata/src/common/result/types';
-import { TestResolverMock } from 'rilata/tests/fixtures/test-resolver-mock';
+import { TestResolverMock, resolver } from 'rilata/tests/fixtures/test-resolver-mock';
 import { ModuleResolver } from 'rilata/src/app/resolves/module-resolver';
 import { WorkshopReadRepository } from 'cy-domain/src/workshop/domain-object/workshop/repository';
 import { WorkshopAttrs } from 'cy-domain/src/workshop/domain-data/workshop/params';
@@ -24,7 +24,6 @@ export namespace SubjectServiceFixtures {
       throw new Error('Method not implemented.');
     }
   }
-  export const resolver: ModuleResolver = new TestResolverMock();
 
   export class UserRepoMock implements UserCmdRepository, UserReadRepository {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

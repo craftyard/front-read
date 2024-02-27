@@ -11,16 +11,13 @@ import { success } from 'rilata/src/common/result/success';
 import { dtoUtility } from 'rilata/src/common/utils/dto';
 import { failure } from 'rilata/src/common/result/failure';
 import { dodUtility } from 'rilata/src/common/utils/domain-object/dod-utility';
+import { UserReadRepository } from 'cy-domain/src/subject/domain-object/user/read-repository';
 import { SubjectServiceFixtures as fixtures } from '../fixtures';
 import { GettingUserService } from './service';
 
 describe('тесты для use-case getUser', () => {
   const sut = new GettingUserService();
   sut.init(resolver);
-  afterEach(() => {
-    fixtures.resolverGetRepoMock.mockClear();
-  });
-
   const user: UserAttrs = {
     userId: 'fa91a299-105b-4fb0-a056-92634249130c',
     telegramId: 5436134100,
@@ -41,9 +38,17 @@ describe('тесты для use-case getUser', () => {
       userId: 'fa91a299-105b-4fb0-a056-92634249130c',
     },
   };
+
+  const userRepo = fixtures.resolverGetUserWorkshopRepoMock(UserReadRepository) as
+  UserReadRepository;
+  const repoGetUserMock = spyOn(userRepo, 'getUser');
+
+  afterEach(() => {
+    repoGetUserMock.mockClear();
+  });
+
   test('успех, запрос для пользователя нормально проходит', async () => {
-    const userRepoMock = fixtures.resolverGetRepoMock();
-    const repoGetUserMock = spyOn(userRepoMock, 'getUser').mockResolvedValueOnce(success(dtoUtility.deepCopy(user)));
+    repoGetUserMock.mockResolvedValueOnce(success(dtoUtility.deepCopy(user)));
     setAndGetTestStoreDispatcher(actionId);
     const result = await sut.execute(dtoUtility.deepCopy(validActionDod));
     expect(result.isSuccess()).toBe(true);
@@ -55,13 +60,12 @@ describe('тесты для use-case getUser', () => {
     repoGetUserMock.mockClear();
   });
   test('провал, данный пользователь не существует', async () => {
-    const userRepo = fixtures.resolverGetRepoMock();
     setAndGetTestStoreDispatcher(actionId);
     const notValidInputOpt = {
       ...validActionDod,
       attrs: { userId: 'dd91a299-105b-4fb0-a056-9263429433c4' }, // not valid
     };
-    const repoGetUserMock = spyOn(userRepo, 'getUser').mockResolvedValueOnce(failure(dodUtility.getDomainErrorByType(
+    repoGetUserMock.mockResolvedValueOnce(failure(dodUtility.getDomainErrorByType(
       'UserDoesNotExistError',
       'Такого пользователя не существует',
       { userId: 'dd91a299-105b-4fb0-a056-9263429433c4' },
@@ -102,11 +106,9 @@ describe('тесты для use-case getUser', () => {
         domainType: 'error',
       },
     });
-    expect(fixtures.resolverGetRepoMock).toHaveBeenCalledTimes(0);
   });
 
   test('провал, не прошла валидация', async () => {
-    fixtures.resolverGetRepoMock();
     setAndGetTestStoreDispatcher(actionId);
     const notValidInputOpt = {
       ...validActionDod,

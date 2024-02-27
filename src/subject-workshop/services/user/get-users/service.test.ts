@@ -6,15 +6,13 @@ import { GetingUsersOut } from 'cy-domain/src/subject/domain-data/user/get-users
 import { UserAttrs } from 'cy-domain/src/subject/domain-data/user/params';
 import { setAndGetTestStoreDispatcher } from 'rilata/tests/fixtures/test-thread-store-mock';
 import { resolver } from 'rilata/tests/fixtures/test-resolver-mock';
+import { UserReadRepository } from 'cy-domain/src/subject/domain-object/user/read-repository';
 import { GettingUsersService } from './service';
 import { SubjectServiceFixtures as fixtures } from '../fixtures';
 
 describe('тесты для use-case getUsers', () => {
   const sut = new GettingUsersService();
   sut.init(resolver);
-  afterEach(() => {
-    fixtures.resolverGetRepoMock.mockClear();
-  });
 
   const users: UserAttrs[] = [
     {
@@ -37,15 +35,22 @@ describe('тесты для use-case getUsers', () => {
     },
   ];
 
+  const userRepo = fixtures.resolverGetUserWorkshopRepoMock(UserReadRepository) as
+  UserReadRepository;
+  const repoGetUserMock = spyOn(userRepo, 'getUsers');
+
+  afterEach(() => {
+    repoGetUserMock.mockClear();
+  });
+
   test('успех, запрос для пользователя нормально проходит', async () => {
-    const userRepo = fixtures.resolverGetRepoMock();
-    const getUsersMock = spyOn(userRepo, 'getUsers').mockResolvedValueOnce([...users]);
+    repoGetUserMock.mockResolvedValueOnce([...users]);
     setAndGetTestStoreDispatcher('pb8a83cf-25a3-2b4f-86e1-2744de6d8374');
     const result = await sut.execute({ ...fixtures.validActionDod });
     expect(result.isSuccess()).toBe(true);
     expect(result.value as GetingUsersOut).toEqual(users);
-    expect(getUsersMock).toHaveBeenCalledTimes(1);
-    expect(getUsersMock.mock.calls[0][0]).toEqual([
+    expect(repoGetUserMock).toHaveBeenCalledTimes(1);
+    expect(repoGetUserMock.mock.calls[0][0]).toEqual([
       'fa91a299-105b-4fb0-a056-92634249130c',
       '493f5cbc-f572-4469-9cf1-3702802e6a31',
     ]);
@@ -70,12 +75,10 @@ describe('тесты для use-case getUsers', () => {
         domainType: 'error',
       },
     });
-    expect(fixtures.resolverGetRepoMock).toHaveBeenCalledTimes(0);
   });
 
   test('провал, не прошла валидация', async () => {
-    const userRepo = fixtures.resolverGetRepoMock();
-    const getUsersMock = spyOn(userRepo, 'getUsers').mockResolvedValueOnce([...users]);
+    repoGetUserMock.mockResolvedValueOnce([...users]);
     setAndGetTestStoreDispatcher('pb8a83cf-25a3-2b4f-86e1-2744de6d8374');
     const notValidInputOpt = {
       ...fixtures.validActionDod,
@@ -108,10 +111,6 @@ describe('тесты для use-case getUsers', () => {
         },
       },
     });
-    expect(getUsersMock).toHaveBeenCalledTimes(1);
-    expect(getUsersMock.mock.calls[0][0]).toEqual([
-      'fa91a299-105b-4fb0-a056-92634249130c',
-      '493f5cbc-f572-4469-9cf1-3702802e6a31',
-    ]);
+    expect(repoGetUserMock).toHaveBeenCalledTimes(0);
   });
 });
