@@ -54,22 +54,6 @@ export namespace SubjectServiceFixtures {
     throw Error(`repository not found for key: ${key}`);
   }) as Mock<(...args: unknown[]) => UserRepoMock | WorkshopRepoMock>;
 
-const actionId: UuidType = 'pb8a83cf-25a3-2b4f-86e1-2744de6d8374';
-
-export const validActionDod: GetUsersActionDod = {
-  meta: {
-    name: 'getUsers',
-    actionId,
-    domainType: 'action',
-  },
-  attrs: {
-    userIds: [
-      'fa91a299-105b-4fb0-a056-92634249130c',
-      '493f5cbc-f572-4469-9cf1-3702802e6a31',
-    ],
-  },
-};
-
 export const workshop: (WorkshopAttrs) = {
   workshopId: '6f91d305-3f4b-4a3d-9bef-72cf3757cc33',
   name: 'TheBestWorkshop',

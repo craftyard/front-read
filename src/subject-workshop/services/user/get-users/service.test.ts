@@ -2,11 +2,12 @@
 import {
   describe, test, expect, spyOn, afterEach,
 } from 'bun:test';
-import { GetingUsersOut } from 'cy-domain/src/subject/domain-data/user/get-users/s-params';
+import { GetUsersActionDod, GetingUsersOut } from 'cy-domain/src/subject/domain-data/user/get-users/s-params';
 import { UserAttrs } from 'cy-domain/src/subject/domain-data/user/params';
 import { setAndGetTestStoreDispatcher } from 'rilata/tests/fixtures/test-thread-store-mock';
 import { resolver } from 'rilata/tests/fixtures/test-resolver-mock';
 import { UserReadRepository } from 'cy-domain/src/subject/domain-object/user/read-repository';
+import { UuidType } from 'rilata/src/common/types';
 import { GettingUsersService } from './service';
 import { SubjectServiceFixtures as fixtures } from '../fixtures';
 
@@ -35,6 +36,22 @@ describe('тесты для use-case getUsers', () => {
     },
   ];
 
+  const actionId: UuidType = 'pb8a83cf-25a3-2b4f-86e1-2744de6d8374';
+
+  const validActionDod: GetUsersActionDod = {
+    meta: {
+      name: 'getUsers',
+      actionId,
+      domainType: 'action',
+    },
+    attrs: {
+      userIds: [
+        'fa91a299-105b-4fb0-a056-92634249130c',
+        '493f5cbc-f572-4469-9cf1-3702802e6a31',
+      ],
+    },
+  };
+
   const userRepo = fixtures.resolverGetUserWorkshopRepoMock(UserReadRepository) as
   UserReadRepository;
   const repoGetUserMock = spyOn(userRepo, 'getUsers');
@@ -46,7 +63,7 @@ describe('тесты для use-case getUsers', () => {
   test('успех, запрос для пользователя нормально проходит', async () => {
     repoGetUserMock.mockResolvedValueOnce([...users]);
     setAndGetTestStoreDispatcher('pb8a83cf-25a3-2b4f-86e1-2744de6d8374');
-    const result = await sut.execute({ ...fixtures.validActionDod });
+    const result = await sut.execute({ ...validActionDod });
     expect(result.isSuccess()).toBe(true);
     expect(result.value as GetingUsersOut).toEqual(users);
     expect(repoGetUserMock).toHaveBeenCalledTimes(1);
@@ -60,7 +77,7 @@ describe('тесты для use-case getUsers', () => {
     setAndGetTestStoreDispatcher('pb8a83cf-25a3-2b4f-86e1-2744de6d8374', {
       type: 'AnonymousUser',
     });
-    const result = await sut.execute({ ...fixtures.validActionDod });
+    const result = await sut.execute({ ...validActionDod });
     expect(result.isFailure()).toBe(true);
     expect(result.value).toEqual({
       locale: {
@@ -81,7 +98,7 @@ describe('тесты для use-case getUsers', () => {
     repoGetUserMock.mockResolvedValueOnce([...users]);
     setAndGetTestStoreDispatcher('pb8a83cf-25a3-2b4f-86e1-2744de6d8374');
     const notValidInputOpt = {
-      ...fixtures.validActionDod,
+      ...validActionDod,
       attrs: {
         userIds: [
           'fa91a299-105b-4fb0-a056-9263429133c', // not valid
