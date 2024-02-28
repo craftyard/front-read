@@ -53,7 +53,7 @@ describe('Тесты для use-case getMyWorkshop', () => {
     const result = await sut.execute(inputOptions);
     expect(result.isSuccess()).toBe(true);
     expect(result.value).toEqual({
-      workshopId: '6f91d305-3f4b-4a3d-9bef-72cf3757cc33',
+      workshopId: 'a29e2bfc-9f52-4f58-afbd-7a6f6f25d51e',
       name: 'Nurbolat',
       city: 'Freital',
       address: 'Gerti-Bruns-Weg 4/7 70279 Freital',

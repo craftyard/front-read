@@ -14,12 +14,13 @@ import { setAndGetTestStoreDispatcher } from 'rilata/tests/fixtures/test-thread-
 import { failure } from 'rilata/src/common/result/failure';
 import { dodUtility } from 'rilata/src/common/utils/domain-object/dod-utility';
 import { UserDoesNotExistError } from 'cy-domain/src/subject/domain-data/user/get-user/s-params';
+import { resolver } from 'rilata/tests/fixtures/test-resolver-mock';
 import { GettingCurrentUserService } from './service';
 import { SubjectServiceFixtures as fixtures } from '../fixtures';
 
 describe('Тесты для use-case репозитория getCurrentUser', () => {
   const sut = new GettingCurrentUserService();
-  sut.init(fixtures.resolver);
+  sut.init(resolver);
 
   const currentUser: CurrentUser = {
     userId: 'fa91a299-105b-4fb0-a056-92634249130c',
