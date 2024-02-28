@@ -30,7 +30,7 @@ describe('Тесты для use-case репозитория getCurrentUser', () 
       lastName: 'Smith',
     },
     workshopId: '6f91d305-3f4b-4a3d-9bef-72cf3757cc33',
-    name: 'TheBestWorkshop',
+    workshopName: 'TheBestWorkshop',
   };
 
   const actionId: UuidType = 'pb8a83cf-25a3-2b4f-86e1-2744de6d8374';
@@ -57,7 +57,7 @@ describe('Тесты для use-case репозитория getCurrentUser', () 
 
   test('успех, запрос для пользователя нормально проходит', async () => {
     repoGetUserMock.mockResolvedValueOnce(success(
-      dtoUtility.excludeAttrs(currentUser, ['workshopId', 'name']),
+      dtoUtility.excludeAttrs(currentUser, ['workshopId', 'workshopName']),
     ));
 
     getWorkshopMock.mockResolvedValueOnce(dtoUtility.deepCopy(fixtures.workshop));
@@ -73,7 +73,9 @@ describe('Тесты для use-case репозитория getCurrentUser', () 
   });
 
   test('Провал, мастерской с таким id не существует', async () => {
-    repoGetUserMock.mockResolvedValueOnce(success(dtoUtility.deepCopy(dtoUtility.excludeAttrs(currentUser, ['workshopId', 'name']))));
+    repoGetUserMock.mockResolvedValueOnce(success(
+      dtoUtility.deepCopy(dtoUtility.excludeAttrs(currentUser, ['workshopId', 'workshopName'])),
+    ));
     getWorkshopMock.mockResolvedValueOnce(undefined);
     setAndGetTestStoreDispatcher(actionId);
     try {
@@ -111,7 +113,8 @@ describe('Тесты для use-case репозитория getCurrentUser', () 
     } catch (e) {
       const error = e as Error;
       expect(error).toBeDefined();
-      expect(error.toString()).toContain('Error: Пользователь с id: fb8a83cf-25a3-2b4f-86e1-27f6de6d8374 подписанным токеном авторизации в базе данных не существует');
+      expect(error.toString())
+        .toContain('Error: Пользователь с id: fb8a83cf-25a3-2b4f-86e1-27f6de6d8374 подписанным токеном авторизации в базе данных не существует');
     }
     expect(getWorkshopMock).toHaveBeenCalledTimes(0);
     expect(repoGetUserMock).toHaveBeenCalledTimes(1);

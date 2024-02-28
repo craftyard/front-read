@@ -38,7 +38,7 @@ export class GettingCurrentUserService extends QueryService<GettingCurrentUserSe
     }
     return success({
       ...result.value,
-      name: workshopAttrs.name,
+      workshopName: workshopAttrs.name,
       workshopId: workshopAttrs.workshopId,
     });
   }
