@@ -4,7 +4,6 @@ import { ModuleResolver } from 'rilata/src/app/resolves/module-resolver';
 import { RunMode } from 'rilata/src/app/types';
 import { Logger } from 'rilata/src/common/logger/logger';
 import { ModelReadRepository } from 'cy-domain/src/model/domain-object/model/read-repository';
-import { AssertionException } from 'rilata/src/common/exeptions';
 import { JWTPayload } from 'cy-domain/src/subject/domain-data/user/user-authentification/a-params';
 import { TokenCreator } from 'rilata/src/app/jwt/token-creator.interface';
 import { TokenVerifier } from 'rilata/src/app/jwt/token-verifier.interface';
@@ -39,9 +38,7 @@ export class ModelReadResolver implements ModuleResolver {
 
   getRepository(key: unknown): unknown {
     if (key === ModelReadRepository) return this.modelReadRepo;
-    const errStr = `not finded key for getRepository method of ModelResolver, key: ${key}`;
-    this.logger.error(errStr);
-    throw new AssertionException(errStr);
+    throw this.logger.error(`not finded key for getRepository method of ModelResolver, key: ${key}`);
   }
 
   getDatabase(): Database {
@@ -50,8 +47,6 @@ export class ModelReadResolver implements ModuleResolver {
 
   getRealisation(key: unknown): unknown {
     if (key === TokenCreator || key === TokenVerifier) return this.tokenManager;
-    const errStr = `not finded key for getRealisation method of ModelResolver, key: ${key}`;
-    this.logger.error(errStr);
-    throw new AssertionException(errStr);
+    throw this.logger.error(`not finded key for getRealisation method of ModelResolver, key: ${key}`);
   }
 }
