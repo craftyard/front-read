@@ -50,16 +50,4 @@ describe('Get workshop models service tests', () => {
     expect(repoGetWorkshopModelsMock.mock.calls[0][0]).toEqual(workshopId);
     repoGetWorkshopModelsMock.mockClear();
   });
-
-  test('should return undefined when client receives no model by workshop id', async () => {
-    const modelRepoMock = ModelServiceFixtures.resolverGetRepoMock();
-    const repoGetWorkshopModelsMock = spyOn(modelRepoMock, 'getWorkshopModel').mockResolvedValueOnce(undefined);
-    setAndGetTestStoreDispatcher(actionId);
-    const result = await sut.execute(validActionDod);
-    expect(result.isSuccess()).toBe(true);
-    expect(result.value).toBeUndefined();
-    expect(repoGetWorkshopModelsMock).toHaveBeenCalledTimes(1);
-    expect(repoGetWorkshopModelsMock.mock.calls[0][0]).toEqual(workshopId);
-    repoGetWorkshopModelsMock.mockClear();
-  });
 });

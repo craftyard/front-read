@@ -6,12 +6,12 @@ import { resolver } from 'rilata/tests/fixtures/test-resolver-mock';
 
 export namespace ModelServiceFixtures {
     export class ModelReadRepositoryMock implements ModelReadRepository {
-      findWorkshopModel(workshopId: string, modelId: string): Promise<ModelAttrs | undefined> {
+      getWorkshopModel(workshopId: string, modelId: string): Promise<ModelAttrs> {
         throw new Error('Method not implemented.');
       }
 
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      getWorkshopModel(workshopId: string, modelId: string): Promise<ModelAttrs | undefined> {
+      getWorkshopModel(workshopId: string, modelId: string): Promise<ModelAttrs> {
         throw new Error('Method not implemented.');
       }
 

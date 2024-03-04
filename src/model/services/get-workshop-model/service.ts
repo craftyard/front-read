@@ -16,8 +16,12 @@ export class GettingWorkshopModelService extends QueryService<GettingWorkshopMod
     actionDod: GetWorkshopModelActionDod,
   ): Promise<ServiceResult<GettingWorkshopModelServiceParams>> {
     const repo = ModelReadRepository.instance(this.moduleResolver);
-    return success(await repo
-      .findWorkshopModel(actionDod.attrs.workshopId, actionDod.attrs.modelId));
+    const repoResult = await repo
+      .getWorkshopModel(actionDod.attrs.workshopId, actionDod.attrs.modelId);
+    if (repoResult.isSuccess()) {
+      success(repoResult.value);
+    }
+    return repoResult;
   }
 
   protected validatorMap = gettingWorkshopModelValidator;
