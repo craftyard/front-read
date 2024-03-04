@@ -7,6 +7,7 @@ import { resolver } from 'rilata/tests/fixtures/test-resolver-mock';
 import { UuidType } from 'rilata/src/common/types';
 import { GetWorkshopModelActionDod } from 'cy-domain/src/model/domain-data/model/get-model/s-params';
 import { ModelAttrs } from 'cy-domain/src/model/domain-data/params';
+import { success } from 'rilata/src/common/result/success';
 import { ModelServiceFixtures } from '../fixtures';
 import { GettingWorkshopModelService } from './service';
 
@@ -41,7 +42,7 @@ describe('Get workshop models service tests', () => {
 
   test('should return workshopModel when client receives model by workshop id', async () => {
     const modelRepoMock = ModelServiceFixtures.resolverGetRepoMock();
-    const repoGetWorkshopModelsMock = spyOn(modelRepoMock, 'getWorkshopModel').mockResolvedValueOnce(workshopModel);
+    const repoGetWorkshopModelsMock = spyOn(modelRepoMock, 'getWorkshopModel').mockResolvedValueOnce(success(workshopModel));
     setAndGetTestStoreDispatcher(actionId);
     const result = await sut.execute(validActionDod);
     expect(result.isSuccess()).toBe(true);
